@@ -15,7 +15,7 @@ import { styles } from '../constants.js';
 
 const FormLayout = (props) => {
   return (
-      <ScrollView mt="20" px="4" width="100%" height="100%">
+      <ScrollView px="4" width="100%" height="100%">
           <Center flex="1">
             <Text fontSize="6xl" textAlign="center" style={styles.logo}>
                 fattorino
@@ -36,7 +36,7 @@ const FormLayout = (props) => {
 // Title to be declared through props.title
 const FilteredListLayout = (props) => {
   return (
-    <Box width="100%" flex="1" mt="10">
+    <Box width="100%" flex="1">
     <Center>
       <Text fontSize="6xl">{ props.title }</Text>
       <ScrollView width="100%" horizontal
@@ -57,7 +57,7 @@ const FilteredListLayout = (props) => {
 
 const ProfileLayout = (props) => {
   return (
-    <ScrollView width="100%" flex="1" mt="10">
+    <ScrollView width="100%" flex="1">
       <Center mb="4">
         <Heading fontSize="4xl">{ props.title }</Heading>
         <Text fontSize="xl">

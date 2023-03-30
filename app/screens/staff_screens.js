@@ -33,7 +33,7 @@ const StaffList = ({navigation}) => {
       by restaurant
       </Button>
       <FilterToggle onCheck={ () => {
-        dataService.addStaffFilter("statusIdle.remove", (staff) => staff.status == "idle");
+        dataService.addStaffFilter("statusIdle.remove", (staff) => staff.status !== "idle");
         refreshStaff();
         setFilters(dataService.getStaffFilters());
       }}
@@ -47,7 +47,7 @@ const StaffList = ({navigation}) => {
       in place
       </FilterToggle>
       <FilterToggle onCheck={ () => {
-        dataService.addStaffFilter("statusDelivering.remove", (staff) => staff.status == "delivering");
+        dataService.addStaffFilter("statusDelivering.remove", (staff) => staff.status !== "delivering");
         refreshStaff();
         setFilters(dataService.getStaffFilters());
       }}

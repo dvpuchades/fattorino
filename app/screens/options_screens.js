@@ -32,7 +32,7 @@ import { colors } from "../constants.js";
 
 const OptionList = ({navigation}) => {
   return (
-    <Box width="100%" flex="1" mt="10">
+    <Box width="100%" flex="1">
     <Center>
       <Text fontSize="6xl">Options</Text>
     </Center>
@@ -83,7 +83,7 @@ const CreateRestaurantScreen = ({navigation}) => {
 const RestaurantList = ({navigation}) => {
   const { restaurants, setRestaurants } = useContext(RestaurantContext);
   return (
-    <Box width="100%" flex="1" mt="10">
+    <Box width="100%" flex="1">
     <Center>
       <Text fontSize="6xl">Restaurants</Text>
     </Center>
