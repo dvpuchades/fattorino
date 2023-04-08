@@ -1,0 +1,19 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Fattorino backend",
+  "main": "sockets.js",
+  "scripts": {
+    "test": "jest --coverage --runInBand"
+  },
+  "author": "dvpuchades",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "mongoose": "^7.0.3",
+    "socket.io": "^4.6.1"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0"
+  }
+}

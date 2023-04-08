@@ -27,4 +27,9 @@ async function authenticateUser(email, password) {
   return user;
 }
 
-module.exports = { createUser, authenticateUser };
+async function findUserById(id) {
+  const user = await User.findById(id).select('-hashedPassword');
+  return user;
+}
+
+module.exports = { createUser, authenticateUser, findUserById };

@@ -1,0 +1,102 @@
+const server = require('http').createServer();
+const io = require('socket.io')(server);
+
+const {
+  register,
+  auth,
+  createBrand,
+  createRestaurant,
+  connectToRestaurant,
+  disconnectFromRestaurant,
+  initializeClient,
+  createDelivery,
+  updateDelivery
+} = require('./logic.js');
+
+io.on('connection', (socket) => {
+  console.log('Client connected:', socket.id);
+
+  socket.on('register', (data) => {
+    register(
+      data.user,
+      (user) => socket.emit('register', { registered: true, user}),
+      (error) => socket.emit('register', { registered: false, error })
+    );
+  });
+
+  socket.on('auth', (data) => {
+    auth(
+      data.user,
+      (user) => socket.emit('auth', { authenticated: true, user }),
+      (error) => socket.emit('auth', { authenticated: false, error })
+    );
+  });
+
+  socket.on('createBrand', (data) => {
+    createBrand(
+      data.brand,
+      (brand) => socket.emit('createBrand', { created: true, brand }),
+      (error) => socket.emit('createBrand', { created: false, error })
+    );
+  });
+
+  socket.on('createRestaurant', (data) => {
+    createRestaurant(
+      data.restaurant,
+      (restaurant) => {
+        const initialData = initializeClient({restaurant: restaurant.brand});
+        socket.emit('initializeClient', { created: true, initialData })
+        socket.join(restaurant._id);
+      },
+      (error) => socket.emit('createRestaurant', { created: false, error })
+    );
+  });
+
+  socket.on('connectToRestaurant', (data) => {
+    connectToRestaurant(
+      () => {
+        const initialData = initializeClient({restaurant: data.brand});
+        socket.emit('initializeClient', { connected: true, initialData });
+      },
+      (error) => socket.emit('connectToRestaurant', { connected: false, error })
+    );
+  });
+
+  socket.on('disconnectFromRestaurant', () => {
+    disconnectFromRestaurant(
+      data,
+      (enrollment) => socket.emit('disconnectFromRestaurant',
+          { disconnected: true, enrollment }),
+        (error) => socket.emit('disconnectFromRestaurant', { disconnected: false, error })
+      );
+    });
+  });
+
+  socket.on('newDelivery', (data) => {
+    createDelivery(data.delivery,
+      (delivery) => {
+        const rooms = Object.keys(socket.rooms);
+        rooms.forEach((room) => {
+          io.to(room).emit('newDelivery', { created: true, delivery });
+        });
+      },
+      (error) => socket.emit('newDelivery', { created: false, error })
+    );
+  });
+
+  socket.on('updateDelivery', (data) => {
+    updateDelivery(data.delivery,
+      (delivery) => {
+        const rooms = Object.keys(socket.rooms);
+        rooms.forEach((room) => {
+          io.to(room).emit('updateDelivery', { updated: true, delivery });
+        });
+      },
+      (error) => socket.emit('updateDelivery', { updated: false, error })
+    );
+  });
+
+
+server.listen(3000, () => {
+  console.log('Server listening on port 3000');
+});
