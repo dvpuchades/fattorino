@@ -3,6 +3,8 @@ const { findLastEnrollmentByUserAndBrand, updateLastEnrollment } = require('./da
 const { findRestaurantById } = require('./database/restaurant');
 const { findRecentOrActiveDeliveries } = require('./database/delivery');
 
+database.connectToDatabase();
+
 function register(user, onSuccess, onFail) {
   database.createUser(user.email, user.name, user.password)
     .then(onSuccess)
