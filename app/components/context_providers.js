@@ -5,13 +5,7 @@ import dataService from "../services/data_service";
 const UserContext = createContext();
 
 const UserProvider = ({children}) => {
-  const [user, setUser] = useState({
-    name: "Victor Hugo",
-    phone: "+39 1234567890",
-    restaurant: "Genis Pizza",
-    balance: 34.55,
-    numberOfDeliveries: 2 
-  });
+  const [user, setUser] = useState(dataService.user);
 
   return (
     <UserContext.Provider value={{user, setUser}}>

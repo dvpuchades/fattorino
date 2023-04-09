@@ -1,6 +1,7 @@
 
 class DataService {
   constructor() {
+    this.user = undefined;
     this.deliveries = [];
     this.trips = [];
     this.staff = [];
@@ -8,6 +9,13 @@ class DataService {
 
     this.deliveryFilters = new Map();
     this.staffFilters = new Map();
+  }
+
+  initialize(data) {
+    this.deliveries = data.deliveries;
+    this.trips = data.trips;
+    this.staff = data.staff;
+    this.restaurants = data.restaurants;
   }
 
   getStaff() {
@@ -24,6 +32,18 @@ class DataService {
       filteredDeliveries = filteredDeliveries.filter(fn);
     }
     return filteredDeliveries;
+  }
+
+  createDelivery(delivery) {
+    this.deliveries.push(delivery);
+  }
+
+  updateDelivery(delivery) {
+    const index = this.deliveries.findIndex(d => d._id === delivery._id);
+    if (index !== -1) {
+      this.deliveries[index] = delivery;
+    }
+    return (index !== -1);
   }
 
   getDeliveryCities() {

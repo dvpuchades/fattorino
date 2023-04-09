@@ -1,23 +1,25 @@
 const server = require('http').createServer();
 const io = require('socket.io')(server);
 
-const {
-  register,
-  auth,
-  createBrand,
-  createRestaurant,
-  connectToRestaurant,
-  disconnectFromRestaurant,
-  initializeClient,
-  createDelivery,
-  updateDelivery
-} = require('./logic.js');
+// const {
+//   register,
+//   auth,
+//   createBrand,
+//   createRestaurant,
+//   connectToRestaurant,
+//   disconnectFromRestaurant,
+//   initializeClient,
+//   createDelivery,
+//   updateDelivery
+// } = require('./logic.js');
+
+const logic = require('./logic.js');
 
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
   socket.on('register', (data) => {
-    register(
+    logic.register(
       data.user,
       (user) => socket.emit('register', { registered: true, user}),
       (error) => socket.emit('register', { registered: false, error })
@@ -25,7 +27,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('auth', (data) => {
-    auth(
+    logic.auth(
       data.user,
       (user) => socket.emit('auth', { authenticated: true, user }),
       (error) => socket.emit('auth', { authenticated: false, error })
@@ -33,7 +35,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('createBrand', (data) => {
-    createBrand(
+    logic.createBrand(
       data.brand,
       (brand) => socket.emit('createBrand', { created: true, brand }),
       (error) => socket.emit('createBrand', { created: false, error })
@@ -41,7 +43,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('createRestaurant', (data) => {
-    createRestaurant(
+    logic.createRestaurant(
       data.restaurant,
       (restaurant) => {
         const initialData = initializeClient({restaurant: restaurant.brand});
@@ -53,7 +55,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('connectToRestaurant', (data) => {
-    connectToRestaurant(
+    logic.connectToRestaurant(
       () => {
         const initialData = initializeClient({restaurant: data.brand});
         socket.emit('initializeClient', { connected: true, initialData });
@@ -63,17 +65,16 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnectFromRestaurant', () => {
-    disconnectFromRestaurant(
+    logic.disconnectFromRestaurant(
       data,
       (enrollment) => socket.emit('disconnectFromRestaurant',
           { disconnected: true, enrollment }),
         (error) => socket.emit('disconnectFromRestaurant', { disconnected: false, error })
       );
-    });
   });
 
   socket.on('newDelivery', (data) => {
-    createDelivery(data.delivery,
+    logic.createDelivery(data.delivery,
       (delivery) => {
         const rooms = Object.keys(socket.rooms);
         rooms.forEach((room) => {
@@ -85,7 +86,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('updateDelivery', (data) => {
-    updateDelivery(data.delivery,
+    logic.updateDelivery(data.delivery,
       (delivery) => {
         const rooms = Object.keys(socket.rooms);
         rooms.forEach((room) => {
@@ -96,6 +97,7 @@ io.on('connection', (socket) => {
     );
   });
 
+});
 
 server.listen(3000, () => {
   console.log('Server listening on port 3000');

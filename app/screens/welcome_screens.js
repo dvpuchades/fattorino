@@ -1,19 +1,27 @@
+import React, { useState } from 'react';
 import {
   Input,
   Button
 } from "native-base";
 import { FormLayout } from '../components/layouts.js';
+import { register } from '../services/socket_handler.js';
 
 const SignUpScreen = ({navigation}) => {
+  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
   return (
     <FormLayout description="Join us and improve your efficency when shipping.">
-      <Input my="5" variant="filled" placeholder="email"/>
-      <Input my="5" variant="filled" placeholder="phone number"/>
-      <Input my="5" variant="filled" placeholder="name"/>
-      <Input my="5" type="password" variant="filled" placeholder="password"/>
+      <Input my="5" variant="filled" placeholder="email" onChange={(event) => setEmail(event.target.value)}/>
+      <Input my="5" variant="filled" placeholder="phone number" onChange={(event) => setPhoneNumber(event.target.value)}/>
+      <Input my="5" variant="filled" placeholder="name" onChange={(event) => setName(event.target.value)}/>
+      <Input my="5" type="password" variant="filled" placeholder="password" onChange={(event) => setPassword(event.target.value)}/>
       <Button my="5" colorScheme="primary" width="100%"
-        onPress={() =>
-          navigation.navigate('ScanQRCodeScreen')
+        onPress={() => {
+            register({email, phoneNumber, name, password});
+            navigation.navigate('ScanQRCodeScreen');
+          }
         }
       >Sign Up</Button>
       <Button my="5" variant="link"
