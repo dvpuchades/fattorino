@@ -1,5 +1,6 @@
 const io = require('socket.io-client');
-const socket = io('http://localhost:3000');
+const { server } = require('../environment.js');
+const socket = io(server.uri);
 
 const { dataService } = require('./data_service');
 

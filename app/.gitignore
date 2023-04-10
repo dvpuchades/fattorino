@@ -11,3 +11,6 @@ web-build/
 .vscode
 .DS_Store
 *.log
+
+# ignoring environment.js (constains sensitive data)
+environment.js
