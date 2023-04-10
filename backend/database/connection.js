@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 
-const DB_URI = "mongodb://localhost:27017/fattorino-development"
+const { database } = require('../environment.js');
+
+const DB_URI = database.uri;
 const TESTING_DB_URI = "mongodb://localhost:27017/fattorino-testing"
 
 async function connectToDatabase(testing = false) {

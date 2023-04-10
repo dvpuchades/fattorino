@@ -44,11 +44,14 @@ const LogInScreen = ({navigation}) => {
   return (
     <FormLayout description="Log in and start delivering.">
       <Input variant="filled" placeholder="email" my="5"
-        onChange={(event) => setEmail(event.target.value)}/>
+        onChangeText={(value) => setEmail(value)}
+        value={email}/>
       <Input type="password" variant="filled" placeholder="password" my="5"
-        onChange={(event) => setPassword(event.target.value)}/>
+        onChangeText={(value) => setPassword(value)}
+        value={password}/>
       <Button colorScheme="primary" width="100%" my="5"
         onPress={() => {
+            console.log('On press:', {email, password});
             authenticate({email, password})
               .then(() => navigation.navigate('ScanQRCodeScreen'))
               .catch((error) => console.log(error));

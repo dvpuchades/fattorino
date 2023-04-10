@@ -11,8 +11,8 @@ function register(user, onSuccess, onFail) {
     .catch(onFail);
 }
 
-function auth(user, onSuccess, onFail) {
-  database.authenticateUser(user.email, user.password)
+function auth({email, password}, onSuccess, onFail) {
+  database.authenticateUser(email, password)
     .then((user) => {
       database.findBrandByCreator(user._id)
         .then((brand) => {

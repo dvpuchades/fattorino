@@ -4,6 +4,7 @@
   "description": "Fattorino backend",
   "main": "sockets.js",
   "scripts": {
+    "start": "node sockets.js",
     "test": "jest --coverage --runInBand"
   },
   "author": "dvpuchades",

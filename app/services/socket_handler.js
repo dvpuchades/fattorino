@@ -44,20 +44,21 @@ function register(data) {
   });
 }
 
-async function authenticate({username, password}) {
-  const response = new Promise((resolve, reject) => {
-    socket.once('auth', (response) => {
-      if (response.authenticated) {
-        console.log('User authenticated:', response.user);
-        resolve();
-      } else {
-        reject(new Error(response.error));
-      }
-    });
-  });
+async function authenticate({email, password}) {
+  // const response = new Promise((resolve, reject) => {
+  //   socket.once('auth', (response) => {
+  //     if (response.authenticated) {
+  //       console.log('User authenticated:', response.user);
+  //       resolve();
+  //     } else {
+  //       reject(new Error(response.error));
+  //     }
+  //   });
+  // });
   console.log('Enters authenticate')
-  await socket.emit('auth', { username, password });
-  await response;
+  const user = { email, password };
+  await socket.emit('auth', user);
+  // await response;
 }
 
 
