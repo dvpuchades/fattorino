@@ -4,7 +4,7 @@ import {
   Button
 } from "native-base";
 import { FormLayout } from '../components/layouts.js';
-import { register } from '../services/socket_handler.js';
+import { register, authenticate } from '../services/socket_handler.js';
 
 const SignUpScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -13,10 +13,14 @@ const SignUpScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
   return (
     <FormLayout description="Join us and improve your efficency when shipping.">
-      <Input my="5" variant="filled" placeholder="email" onChange={(event) => setEmail(event.target.value)}/>
-      <Input my="5" variant="filled" placeholder="phone number" onChange={(event) => setPhoneNumber(event.target.value)}/>
-      <Input my="5" variant="filled" placeholder="name" onChange={(event) => setName(event.target.value)}/>
-      <Input my="5" type="password" variant="filled" placeholder="password" onChange={(event) => setPassword(event.target.value)}/>
+      <Input my="5" variant="filled" placeholder="email"
+        onChange={(event) => setEmail(event.target.value)}/>
+      <Input my="5" variant="filled" placeholder="phone number"
+        onChange={(event) => setPhoneNumber(event.target.value)}/>
+      <Input my="5" variant="filled" placeholder="name"
+        onChange={(event) => setName(event.target.value)}/>
+      <Input my="5" type="password" variant="filled" placeholder="password"
+        onChange={(event) => setPassword(event.target.value)}/>
       <Button my="5" colorScheme="primary" width="100%"
         onPress={() => {
             register({email, phoneNumber, name, password});
@@ -35,13 +39,20 @@ const SignUpScreen = ({navigation}) => {
 };
 
 const LogInScreen = ({navigation}) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   return (
     <FormLayout description="Log in and start delivering.">
-      <Input variant="filled" placeholder="email" my="5"/>
-      <Input type="password" variant="filled" placeholder="password" my="5"/>
+      <Input variant="filled" placeholder="email" my="5"
+        onChange={(event) => setEmail(event.target.value)}/>
+      <Input type="password" variant="filled" placeholder="password" my="5"
+        onChange={(event) => setPassword(event.target.value)}/>
       <Button colorScheme="primary" width="100%" my="5"
-        onPress={() =>
-          navigation.navigate('ScanQRCodeScreen')
+        onPress={() => {
+            authenticate({email, password})
+              .then(() => navigation.navigate('ScanQRCodeScreen'))
+              .catch((error) => console.log(error));
+          }
         }
       >Log In</Button>
       <Button variant="link" my="5"

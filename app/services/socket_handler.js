@@ -35,6 +35,7 @@ function register(data) {
   socket.emit('register', data);
   socket.once('register', (response) => {
     if (response.registered) {
+      console.log('User registered:', response.user);
       dataService.user = response.user;
     } else {
       throw new Error(response.error);
@@ -42,15 +43,20 @@ function register(data) {
   });
 }
 
-function authenticate({username, password}) {
-  socket.emit('auth', { username, password });
-  socket.once('auth', (response) => {
-    if (response.authenticated) {
-      console.log('User authenticated:', response.user);
-    } else {
-      throw new Error(response.error);
-    }
+async function authenticate({username, password}) {
+  const response = new Promise((resolve, reject) => {
+    socket.once('auth', (response) => {
+      if (response.authenticated) {
+        console.log('User authenticated:', response.user);
+        resolve();
+      } else {
+        reject(new Error(response.error));
+      }
+    });
   });
+  console.log('Enters authenticate')
+  await socket.emit('auth', { username, password });
+  await response;
 }
 
 
@@ -97,3 +103,12 @@ function newDelivery(data) {
     }
   });
 }
+
+module.exports = {
+  register,
+  authenticate,
+  createBrand,
+  connectToRestaurant,
+  disconnectFromRestaurant,
+  newDelivery
+};
