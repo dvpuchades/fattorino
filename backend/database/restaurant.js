@@ -1,7 +1,4 @@
-const mongoose = require('mongoose');
-const restaurantSchema = require('./models/restaurant');
-
-const Restaurant = mongoose.model('Restaurant', restaurantSchema);
+const Restaurant = require('./models/restaurant.js');
 
 async function createRestaurant({brand, name, address, city, postcode, creator, created}) {
   const restaurant = new Restaurant({brand, name, address, city, postcode, creator, created});

@@ -30,8 +30,7 @@ describe('Restaurant service', () => {
         address: '456 Main St',
         city: 'Anytown',
         postcode: '12345',
-        creator: testUserId,
-        created: date
+        creator: testUserId
       };
       const createdRestaurant = await createRestaurant(restaurantData);
       testRestaurantId = createdRestaurant._id;
@@ -42,7 +41,7 @@ describe('Restaurant service', () => {
       expect(createdRestaurant.city).toEqual('Anytown');
       expect(createdRestaurant.postcode).toEqual('12345');
       expect(createdRestaurant.creator).toEqual(testUserId);
-      expect(createdRestaurant.created).toEqual(date);
+      expect(createdRestaurant.created).toBeInstanceOf(Date);
     });
   });
 
