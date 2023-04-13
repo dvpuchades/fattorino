@@ -33,8 +33,10 @@ io.on('connection', (socket) => {
     logic.createRestaurant(
       data.restaurant,
       (restaurant) => {
-        const initialData = logic.initializeClient({brand: restaurant.brand});
-        socket.emit('initializeClient', { created: true, initialData })
+        logic.initializeClient({brand: restaurant.brand},
+          (initialData) => socket.emit('initializeClient', { created: true, initialData }),
+          (error) => socket.emit('initializeClient', { created: false, error })
+        );
         socket.join(restaurant._id);
       },
       (error) => socket.emit('createRestaurant', { created: false, error })

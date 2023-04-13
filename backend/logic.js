@@ -129,7 +129,7 @@ function initializeClient({brand}, onSuccess, onFail) {
     })
     .catch(onFail);
   Promise.all([deliveries, restaurants, staff]);
-  return {deliveries, restaurants, staff};
+  onSuccess({deliveries, restaurants, staff});
 }
 
 function createDelivery(delivery, onSuccess, onFail) {
