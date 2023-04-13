@@ -1,4 +1,4 @@
-const { Schema } = require('mongoose');
+const { Schema, model } = require('mongoose');
 
 const restaurantSchema = new Schema({
   brand: { type: Schema.Types.ObjectId, ref: 'Brand', required: true },
