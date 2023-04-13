@@ -33,7 +33,7 @@ io.on('connection', (socket) => {
     logic.createRestaurant(
       data.restaurant,
       (restaurant) => {
-        const initialData = initializeClient({restaurant: restaurant.brand});
+        const initialData = logic.initializeClient({brand: restaurant.brand});
         socket.emit('initializeClient', { created: true, initialData })
         socket.join(restaurant._id);
       },

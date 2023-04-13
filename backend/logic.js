@@ -119,7 +119,7 @@ function disconnectFromRestaurant({user, restaurant}, onSuccess, onFail) {
     .catch(onFail);
 }
 
-function initializeClient({user, brand}, onSuccess, onFail) {
+function initializeClient({brand}, onSuccess, onFail) {
   const deliveries = database.findRecentOrActiveDeliveries(brand).catch(onFail);
   const restaurants = database.findRestaurantsByBrandId(brand).catch(onFail);
   const staff = database.findEnrolledUsersByBrand(brand)
