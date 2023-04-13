@@ -12,6 +12,8 @@ import {
   Input
 } from "native-base";
 import { styles } from '../constants.js';
+import { UserContext } from './context_providers.js';
+import { Restaurant } from '../services/models.js';
 
 const FormLayout = (props) => {
   return (
@@ -74,18 +76,15 @@ const CreateRestaurantForm = (props) => {
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [postcode, setPostcode] = useState('');
-  const { user } = useContext(AuthContext);
+  const { user } = useContext(UserContext);
   
   const handleSubmit = () => {
-    const restaurant = {
-      id: Math.random().toString(),
-      name: name,
-      address: address,
-      city: city,
-      postcode: postcode,
-      uploadUser: user.name,
-      initTime: new Date().toLocaleString(),
-    }
+    const restaurant = new Restaurant(
+      name,
+      address,
+      city,
+      postcode
+    );
     props.onSubmit(restaurant);
   }
 

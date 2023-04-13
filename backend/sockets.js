@@ -1,18 +1,5 @@
 const server = require('http').createServer();
 const io = require('socket.io')(server);
-
-// const {
-//   register,
-//   auth,
-//   createBrand,
-//   createRestaurant,
-//   connectToRestaurant,
-//   disconnectFromRestaurant,
-//   initializeClient,
-//   createDelivery,
-//   updateDelivery
-// } = require('./logic.js');
-
 const logic = require('./logic.js');
 
 io.on('connection', (socket) => {

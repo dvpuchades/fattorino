@@ -3,8 +3,8 @@ const restaurantSchema = require('./models/restaurant');
 
 const Restaurant = mongoose.model('Restaurant', restaurantSchema);
 
-async function createRestaurant({brand, name, address, city, postcode}) {
-  const restaurant = new Restaurant({brand, name, address, city, postcode});
+async function createRestaurant({brand, name, address, city, postcode, creator, created}) {
+  const restaurant = new Restaurant({brand, name, address, city, postcode, creator, created});
   return restaurant.save();
 }
 

@@ -14,17 +14,22 @@ const SignUpScreen = ({navigation}) => {
   return (
     <FormLayout description="Join us and improve your efficency when shipping.">
       <Input my="5" variant="filled" placeholder="email"
-        onChange={(event) => setEmail(event.target.value)}/>
+        onChangeText={(value) => setEmail(value)}
+        value={email}/>
       <Input my="5" variant="filled" placeholder="phone number"
-        onChange={(event) => setPhoneNumber(event.target.value)}/>
+        onChangeText={(value) => setPhoneNumber(value)}
+        value={phoneNumber}/>
       <Input my="5" variant="filled" placeholder="name"
-        onChange={(event) => setName(event.target.value)}/>
+        onChangeText={(value) => setName(value)}
+        value={name}/>
       <Input my="5" type="password" variant="filled" placeholder="password"
-        onChange={(event) => setPassword(event.target.value)}/>
+        onChangeText={(value) => setPassword(value)}
+        value={password}/>
       <Button my="5" colorScheme="primary" width="100%"
         onPress={() => {
-            register({email, phoneNumber, name, password});
-            navigation.navigate('ScanQRCodeScreen');
+            register({email, phoneNumber, name, password})
+              .then(() => navigation.navigate('ScanQRCodeScreen'))
+              .catch((error) => console.log(error));
           }
         }
       >Sign Up</Button>
@@ -51,7 +56,6 @@ const LogInScreen = ({navigation}) => {
         value={password}/>
       <Button colorScheme="primary" width="100%" my="5"
         onPress={() => {
-            console.log('On press:', {email, password});
             authenticate({email, password})
               .then(() => navigation.navigate('ScanQRCodeScreen'))
               .catch((error) => console.log(error));

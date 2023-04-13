@@ -1,8 +1,8 @@
-const io = require('socket.io-client');
-const { server } = require('../environment.js');
+import io from 'socket.io-client';
+import { server } from '../environment.js';
 const socket = io(server.uri);
 
-const { dataService } = require('./data_service');
+import dataService from "./data_service";
 
 socket.on('connect', () => {
   console.log('Connected to server:', socket.id);
@@ -32,45 +32,65 @@ socket.on('updateDelivery', (data) => {
   }
 });
 
-function register(data) {
-  socket.emit('register', data);
-  socket.once('register', (response) => {
-    if (response.registered) {
-      console.log('User registered:', response.user);
-      dataService.user = response.user;
-    } else {
-      throw new Error(response.error);
-    }
+async function register(user) {
+  const response = new Promise ((resolve, reject) => {
+    socket.once('register', (response) => {
+      if (response.registered) {
+        dataService.user = response.user;
+        resolve();
+      } else {
+        reject(new Error(response.error));
+      }
+    });
   });
+  await socket.emit('register', {user});
+  await response;
 }
 
 async function authenticate({email, password}) {
-  // const response = new Promise((resolve, reject) => {
-  //   socket.once('auth', (response) => {
-  //     if (response.authenticated) {
-  //       console.log('User authenticated:', response.user);
-  //       resolve();
-  //     } else {
-  //       reject(new Error(response.error));
-  //     }
-  //   });
-  // });
-  console.log('Enters authenticate')
+  const response = new Promise((resolve, reject) => {
+    socket.once('auth', (response) => {
+      if (response.authenticated) {
+        dataService.user = response.user;
+        resolve();
+      } else {
+        reject(new Error(response.error));
+      }
+    });
+  });
   const user = { email, password };
-  await socket.emit('auth', user);
-  // await response;
+  await socket.emit('auth', {user});
+  await response;
 }
 
-
-function createBrand(data) {
-  socket.emit('createBrand', data);
-  socket.once('createBrand', (response) => {
-    if (response.created) {
-      console.log('Brand created:', response.brand);
-    } else {
-      throw new Error(response.error);
-    }
+async function createBrand(brand) {
+  const response = new Promise((resolve, reject) => {
+    socket.once('createBrand', (response) => {
+      if (response.created) {
+        dataService.user.brand = response.brand;
+        resolve();
+      } else {
+        reject(new Error(response.error));
+      }
+    });
   });
+  await socket.emit('createBrand', {brand});
+  await response;
+}
+
+async function createRestaurant(restaurant) {
+  const response = new Promise((resolve, reject) => {
+    socket.once('createRestaurant', (response) => {
+      if (response.created) {
+        dataService.user.restaurant = response.restaurant;
+        resolve();
+      } else {
+        reject(new Error(response.error));
+      }
+    });
+  });
+  await socket.emit('createRestaurant', {restaurant});
+  await response;
 }
 
 function connectToRestaurant(data) {
@@ -110,6 +130,7 @@ module.exports = {
   register,
   authenticate,
   createBrand,
+  createRestaurant,
   connectToRestaurant,
   disconnectFromRestaurant,
   newDelivery

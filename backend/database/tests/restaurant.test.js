@@ -8,6 +8,8 @@ const {
 
 const testBrandId = new mongoose.Types.ObjectId();
 let testRestaurantId;
+const testUserId = new mongoose.Types.ObjectId();
+const date = new Date();
 
 beforeAll(async () => {
   // Connect to test database
@@ -28,6 +30,8 @@ describe('Restaurant service', () => {
         address: '456 Main St',
         city: 'Anytown',
         postcode: '12345',
+        creator: testUserId,
+        created: date
       };
       const createdRestaurant = await createRestaurant(restaurantData);
       testRestaurantId = createdRestaurant._id;
@@ -37,6 +41,8 @@ describe('Restaurant service', () => {
       expect(createdRestaurant.address).toEqual('456 Main St');
       expect(createdRestaurant.city).toEqual('Anytown');
       expect(createdRestaurant.postcode).toEqual('12345');
+      expect(createdRestaurant.creator).toEqual(testUserId);
+      expect(createdRestaurant.created).toEqual(date);
     });
   });
 

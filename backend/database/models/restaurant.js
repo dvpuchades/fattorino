@@ -5,7 +5,11 @@ const restaurantSchema = new Schema({
   name: { type: String, required: true },
   address: { type: String, required: true },
   city: { type: String, required: true },
-  postcode: { type: String, required: true }
+  postcode: { type: String, required: true },
+  creator: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  created: { type: Date, default: Date.now }
 });
 
-module.exports = restaurantSchema;
+const Restaurant = model('Restaurant', restaurantSchema);
+
+module.exports = Restaurant;

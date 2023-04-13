@@ -1,19 +1,22 @@
 import React, { useState } from "react";
 import {Button, Input} from "native-base";
 import { FormLayout, CreateRestaurantForm } from "../components/layouts.js";
-import { createBrand } from "../services/socket_handler.js";
+import { createBrand, createRestaurant } from "../services/socket_handler.js";
+import { Brand } from "../services/models.js";
 
 const CreateBrandScreen = ({navigation}) => {
   const [brandName, setBrandName] = useState('');
   return (
     <FormLayout description="Enter your restaurants brand or the name of your chain restaurant.">
       <Input my="5" placeholder="brand name"
-      onChange={(event) => setBrandName(event.target.value)}/>
+      onChangeText={(value) => setBrandName(value)}
+      value={brandName}/>
       <Button my="5" colorScheme="primary"
       width="100%"
       onPress={() => {
-          createBrand({brandName});
-          navigation.navigate('CreateRestaurantScreen')
+          createBrand(new Brand(brandName))
+            .then(() => navigation.navigate('CreateRestaurantScreen'))
+            .catch((error) => console.log(error));
         }
       }
       >Register Brand</Button>
@@ -23,9 +26,11 @@ const CreateBrandScreen = ({navigation}) => {
 
 const CreateFirstRestaurantScreen = ({navigation}) => {
   const submitRestaurant = (restaurant) => {
-    navigation.navigate("DashboardScreen");
+    console.log(restaurant);
+    createRestaurant(restaurant)
+      .then(() => navigation.navigate("DashboardScreen"))
+      .catch((error) => console.log(error));
   };
-
   return (
     <CreateRestaurantForm onSubmit={(restaurant) => submitRestaurant(restaurant)}/>
   );

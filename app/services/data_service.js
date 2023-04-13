@@ -1,7 +1,7 @@
 
 class DataService {
   constructor() {
-    this.user = undefined;
+    this.user = null;
     this.deliveries = [];
     this.trips = [];
     this.staff = [];
@@ -571,6 +571,6 @@ class DataService {
 
 const dataService = new DataService();
 
-dataService.fillWithTestData();
+// dataService.fillWithTestData();
 
 export default dataService;
