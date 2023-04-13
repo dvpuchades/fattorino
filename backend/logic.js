@@ -32,7 +32,7 @@ function createBrand(brand, onSuccess, onFail) {
 }
 
 function createRestaurant(restaurant, onSuccess, onFail) {
-  database.createRestaurant(restaurant.name, restaurant.brand)
+  database.createRestaurant(restaurant)
     .then(onSuccess)
     .catch(onFail);
 }

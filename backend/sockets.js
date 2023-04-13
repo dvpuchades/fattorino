@@ -39,7 +39,7 @@ io.on('connection', (socket) => {
         );
         socket.join(restaurant._id);
       },
-      (error) => socket.emit('createRestaurant', { created: false, error })
+      (error) => socket.emit('initializeClient', { created: false, error })
     );
   });
 
