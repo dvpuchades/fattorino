@@ -120,16 +120,16 @@ function disconnectFromRestaurant({user, restaurant}, onSuccess, onFail) {
 }
 
 function initializeClient({brand}, onSuccess, onFail) {
-  const deliveries = database.findRecentOrActiveDeliveries(brand).catch(onFail);
-  const restaurants = database.findRestaurantsByBrandId(brand).catch(onFail);
+  const deliveries = database.findRecentOrActiveDeliveries(brand);
+  const restaurants = database.findRestaurantsByBrandId(brand);
   const staff = database.findEnrolledUsersByBrand(brand)
     .then((users) => {
-      users.map(user => findUserById(user).catch(onFail));
-      return Promise.all(users);
-    })
+      const promises = users.map(user => findUserById(user).catch(onFail));
+      return Promise.all(promises);
+    });
+  Promise.all([deliveries, restaurants, staff])
+    .then(([deliveries, restaurants, staff]) => onSuccess({deliveries, restaurants, staff}))
     .catch(onFail);
-  Promise.all([deliveries, restaurants, staff]);
-  onSuccess({deliveries, restaurants, staff});
 }
 
 function createDelivery(delivery, onSuccess, onFail) {

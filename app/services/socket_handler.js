@@ -8,14 +8,6 @@ socket.on('connect', () => {
   console.log('Connected to server:', socket.id);
 });
 
-socket.on('initializeClient', (data) => {
-  if (data.created) {
-    dataService.initialize(data.initialData);
-  } else {
-    console.log('Error initializing client:', data.error);
-  }
-});
-
 socket.on('newDelivery', (data) => {
   if (data.created) {
     dataService.createDelivery(data.delivery);
@@ -80,9 +72,10 @@ async function createBrand(brand) {
 
 async function createRestaurant(restaurant) {
   const response = new Promise((resolve, reject) => {
-    socket.once('createRestaurant', (response) => {
+    socket.once('initializeClient', (response) => {
+      console.log('Response: ', response);
       if (response.created) {
-        dataService.user.restaurant = response.restaurant;
+        dataService.initialize(response.initialData);
         resolve();
       } else {
         reject(new Error(response.error));

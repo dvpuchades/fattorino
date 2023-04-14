@@ -90,7 +90,7 @@ const RestaurantList = ({navigation}) => {
     <Box flex="5">
     <ScrollView>
     {restaurants.map((item) => (
-      <RestaurantListItem key={item.id} item={item}
+      <RestaurantListItem key={item._id} item={item}
       navigation={navigation}/>
     ))}
     </ScrollView>
