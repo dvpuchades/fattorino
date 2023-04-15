@@ -43,8 +43,9 @@ io.on('connection', (socket) => {
     );
   });
 
-  socket.on('connectToRestaurant', (data) => {
+  socket.on('connectToRestaurant', ({user, restaurant}) => {
     logic.connectToRestaurant(
+      {user, restaurant},
       ({brand, position}) => {
         logic.initializeClient({brand: brand});
         socket.emit('initializeClient', { connected: true, initialData, position });

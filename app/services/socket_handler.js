@@ -89,9 +89,9 @@ async function createRestaurant(restaurant) {
   await response;
 }
 
-async function connectToRestaurant(data) {
+async function connectToRestaurant(restaurant) {
   const response = initializeClientPromise;
-  await socket.emit('connectToRestaurant', data);
+  await socket.emit('connectToRestaurant', {user: dataService.user, restaurant});
   await response;
 }
 

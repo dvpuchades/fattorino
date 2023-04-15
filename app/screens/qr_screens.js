@@ -20,7 +20,7 @@ const ScanQRCodeScreen = ({navigation}) => {
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
     connectToRestaurant(data)
       .then(() => navigation.navigate("DashboardScreen"))
       .catch((error) => console.log(error));
