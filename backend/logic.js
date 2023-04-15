@@ -37,7 +37,7 @@ function createRestaurant(restaurant, onSuccess, onFail) {
     .catch(onFail);
 }
 
-function connectToRestaurant({user, brand, restaurant}, onSuccess, onFail) {
+function connectToRestaurant({user, restaurant}, onSuccess, onFail) {
   const firstEnrollment = () => {
     database.findRestaurantById(restaurant)
       .then((foundRestaurant) => {
@@ -57,51 +57,55 @@ function connectToRestaurant({user, brand, restaurant}, onSuccess, onFail) {
       })
       .catch(onFail);
   };
-  database.findLastEnrollmentByUserAndBrand(user._id, brand)
-    .then((enrollment) => {
-      if (enrollment) {
-        if (enrollment.position === 'admin') {
-          if (enrollment.endTime) {
-            database.createEnrollment({
-              user: user._id,
-              brand,
-              restaurant,
-              position: 'admin',
-              initTime: new Date()
-            })
-          }
-          onSuccess({brand, position});
-        }
-        else {
-          database.findLastEnrollmentByUserAndRestaurant(user._id, restaurant)
-            .then((enrollment) => {
-              if (enrollment) {
-                if (enrollment.brand !== brand) {
-                  onFail('Brand and restaurant do not match');
-                }
-                else {
-                  if (enrollment.endTime) {
-                    database.createEnrollment({
-                      user: user._id,
-                      brand,
-                      restaurant,
-                      position: enrollment.position,
-                      initTime: new Date()
-                    })
+  database.findRestaurantById(restaurant)
+    .then(({brand}) => {
+      database.findLastEnrollmentByUserAndBrand(user._id, brand)
+        .then((enrollment) => {
+          if (enrollment) {
+            if (enrollment.position === 'admin') {
+              if (enrollment.endTime) {
+                database.createEnrollment({
+                  user: user._id,
+                  brand,
+                  restaurant,
+                  position: 'admin',
+                  initTime: new Date()
+                })
+              }
+              onSuccess({brand, position});
+            }
+            else {
+              database.findLastEnrollmentByUserAndRestaurant(user._id, restaurant)
+                .then((enrollment) => {
+                  if (enrollment) {
+                    if (enrollment.brand !== brand) {
+                      onFail('Brand and restaurant do not match');
+                    }
+                    else {
+                      if (enrollment.endTime) {
+                        database.createEnrollment({
+                          user: user._id,
+                          brand,
+                          restaurant,
+                          position: enrollment.position,
+                          initTime: new Date()
+                        })
+                      }
+                      onSuccess({brand, position: enrollment.position});
+                    }
                   }
-                  onSuccess({brand, position: enrollment.position});
-                }
-              }
-              else {
-                firstEnrollment();
-              }
-            })
-            .catch(onFail);
-        }
-      }
-      else {
-        firstEnrollment();
-      }
+                  else {
+                    firstEnrollment();
+                  }
+                })
+                .catch(onFail);
+            }
+          }
+          else {
+            firstEnrollment();
+          }
+        })
+        .catch(onFail);
     })
     .catch(onFail);
 }

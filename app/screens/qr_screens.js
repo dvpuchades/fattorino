@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import { View, Center, VStack, Button, Text, Spacer } from 'native-base';
 // https://docs.expo.io/versions/latest/sdk/bar-code-scanner/
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import { connectToRestaurant } from '../services/socket_handler.js';
 
 const ScanQRCodeScreen = ({navigation}) => {
   const [hasPermission, setHasPermission] = useState(null);
@@ -20,6 +21,9 @@ const ScanQRCodeScreen = ({navigation}) => {
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    connectToRestaurant(data)
+      .then(() => navigation.navigate("DashboardScreen"))
+      .catch((error) => console.log(error));
   };
 
   if (hasPermission === null) {

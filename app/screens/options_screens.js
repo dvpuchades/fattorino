@@ -119,7 +119,7 @@ const RestaurantProfile = ({ route }) => {
   return (
     <ProfileLayout title={restaurant.name}>
         <Center mb="5">
-          <QRCode value={restaurant.id}/>
+          <QRCode value={restaurant._id}/>
         </Center>
         <Box mx="4">
           <Option text="connect to restaurant" icon="home-import-outline"/>

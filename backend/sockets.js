@@ -34,7 +34,7 @@ io.on('connection', (socket) => {
       data.restaurant,
       (restaurant) => {
         logic.initializeClient({brand: restaurant.brand},
-          (initialData) => socket.emit('initializeClient', { created: true, initialData }),
+          (initialData) => socket.emit('initializeClient', { created: true, initialData, position: 'admin' }),
           (error) => socket.emit('initializeClient', { created: false, error })
         );
         socket.join(restaurant._id);
@@ -45,11 +45,11 @@ io.on('connection', (socket) => {
 
   socket.on('connectToRestaurant', (data) => {
     logic.connectToRestaurant(
-      () => {
-        const initialData = initializeClient({restaurant: data.brand});
-        socket.emit('initializeClient', { connected: true, initialData });
+      ({brand, position}) => {
+        logic.initializeClient({brand: brand});
+        socket.emit('initializeClient', { connected: true, initialData, position });
       },
-      (error) => socket.emit('connectToRestaurant', { connected: false, error })
+      (error) => socket.emit('initializeClient', { connected: false, error })
     );
   });
 

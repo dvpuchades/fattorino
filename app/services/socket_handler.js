@@ -70,31 +70,29 @@ async function createBrand(brand) {
   await response;
 }
 
-async function createRestaurant(restaurant) {
-  const response = new Promise((resolve, reject) => {
-    socket.once('initializeClient', (response) => {
-      console.log('Response: ', response);
-      if (response.created) {
-        dataService.initialize(response.initialData);
-        resolve();
-      } else {
-        reject(new Error(response.error));
-      }
-    });
+const initializeClientPromise = new Promise((resolve, reject) => {
+  socket.once('initializeClient', (response) => {
+    console.log('Response: ', response);
+    if (response.created) {
+      dataService.initialize(response.initialData);
+      dataService.user.position = response.position;
+      resolve();
+    } else {
+      reject(new Error(response.error));
+    }
   });
+});
+
+async function createRestaurant(restaurant) {
+  const response = initializeClientPromise;
   await socket.emit('createRestaurant', {restaurant});
   await response;
 }
 
-function connectToRestaurant(data) {
-  socket.emit('connectToRestaurant', data);
-  socket.once('connectToRestaurant', (response) => {
-    if (response.connected) {
-      console.log('Connected to restaurant:', response.initialData);
-    } else {
-      throw new Error(response.error);
-    }
-  });
+async function connectToRestaurant(data) {
+  const response = initializeClientPromise;
+  await socket.emit('connectToRestaurant', data);
+  await response;
 }
 
 function disconnectFromRestaurant(data) {

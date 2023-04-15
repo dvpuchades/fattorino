@@ -16,7 +16,13 @@ afterAll(async () => {
 describe('Brand functions', () => {
   describe('createBrand', () => {
     it('should create a new brand', async () => {
-      const testUser = await createUser('newbrand@test.com', 'testUser', 'testPassword');
+      const testUser = await createUser(
+        {
+          email: 'newbrand@test.com',
+          name: 'testUser',
+          password: 'testPassword',
+          phone: '1234567890'
+        });
       const brand = await createBrand('Test New Brand', testUser._id);
       expect(brand.name).toEqual('Test New Brand');
       expect(brand.creator).toEqual(testUser._id);
@@ -26,14 +32,25 @@ describe('Brand functions', () => {
 
   describe('findBrandByCreator', () => {
     it('should find a brand by creator', async () => {
-      const testUser = await createUser('creatorbrand@test.com', 'testUser', 'testPassword');
+      const testUser = await createUser(
+        {
+          email: 'creatorbrand@test.com', 
+          name: 'testUser', 
+          password: 'testPassword',
+          phone: '1234567890'
+        });
       const brand = await createBrand('Test Brand By Creator', testUser._id);
       const foundBrand = await findBrandByCreator(testUser._id);
       expect(foundBrand._id).toEqual(brand._id);
     });
 
     it('should return null if brand not found', async () => {
-      const testUser = await createUser('nobrand@test.com', 'testUser', 'testPassword');
+      const testUser = await createUser({
+        email: 'nobrand@test.com',
+        name: 'testUser',
+        password: 'testPassword',
+        phone: '1234567890'
+      });
       const foundBrand = await findBrandByCreator(testUser._id);
       expect(foundBrand).toBeNull();
     });
@@ -41,7 +58,12 @@ describe('Brand functions', () => {
 
   describe('findBrandById', () => {
     it('should find a brand by id', async () => {
-      const testUser = await createUser('idbrand@test.com', 'testUser', 'testPassword');
+      const testUser = await createUser({
+        email: 'idbrand@test.com',
+        name: 'testUser',
+        password: 'testPassword',
+        phone: '1234567890'
+      });
       const brand = await createBrand('Test id Brand', testUser._id);
       const foundBrand = await findBrandById(brand._id);
       expect(foundBrand.name).toEqual('Test id Brand');
