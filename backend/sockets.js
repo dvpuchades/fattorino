@@ -47,10 +47,11 @@ io.on('connection', (socket) => {
     logic.connectToRestaurant(
       {user, restaurant},
       ({brand, position}) => {
-        logic.initializeClient({brand: brand});
-        socket.emit('initializeClient', { connected: true, initialData, position });
+        logic.initializeClient({brand: brand},
+          (initialData) => socket.emit('initializeClient', { connected: true, initialData, position }),
+          (error) => socket.emit('initializeClient', { connected: false, error })
+        );
       },
-      (error) => socket.emit('initializeClient', { connected: false, error })
     );
   });
 

@@ -4,6 +4,7 @@ const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   phone: { type: String, required: true },
+  status: { type: String, default: 'idle' },
   hashedPassword: { type: String, required: true }
 });
 

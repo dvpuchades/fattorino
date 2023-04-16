@@ -37,7 +37,7 @@ async function findEnrolledUsersByBrand(brandId) {
     brand: brandId,
     endTime: { $exists: false }
   }).sort({initTime: -1});
-  return enrollments.map(enrollment => enrollment.user);
+  return enrollments;
 }
 
 // Update an enrollment
