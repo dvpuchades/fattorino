@@ -41,21 +41,18 @@ function connectToRestaurant({user, restaurant}, onSuccess, onFail) {
   const firstEnrollment = () => {
     database.findRestaurantById(restaurant)
       .then((foundRestaurant) => {
-        if (foundRestaurant.brand !== brand) {
-          onFail('Brand and restaurant do not match');
-        }
-        else {
-          database.createEnrollment({
-            user: user._id,
-            brand,
-            restaurant,
-            position: 'staff',
-            initTime: new Date()
+        database.createEnrollment({
+          user: user._id,
+          brand: foundRestaurant.brand,
+          restaurant,
+          position: 'staff'
+        })
+          .then(() => {
+            onSuccess({brand, restaurant, position: "staff"})
           })
-          onSuccess({brand, restaurant, position: 'staff'});
-        }
+          .catch(error => console.log(error))
       })
-      .catch(onFail);
+      .catch(error => console.log(error));
   };
   database.findRestaurantById(restaurant)
     .then(({brand}) => {
@@ -77,7 +74,7 @@ function connectToRestaurant({user, restaurant}, onSuccess, onFail) {
               database.findLastEnrollmentByUserAndRestaurant(user._id, restaurant)
                 .then((enrollment) => {
                   if (enrollment) {
-                    if (enrollment.brand !== brand) {
+                    if (!enrollment.brand.equals(brand)) {
                       onFail('Brand and restaurant do not match');
                     }
                     else {
@@ -104,9 +101,9 @@ function connectToRestaurant({user, restaurant}, onSuccess, onFail) {
             firstEnrollment();
           }
         })
-        .catch(onFail);
+        .catch((error) => onFail(error));
     })
-    .catch(onFail);
+    .catch((error) => onFail(error));
 }
 
 function disconnectFromRestaurant({user, restaurant}, onSuccess, onFail) {
@@ -126,13 +123,23 @@ function initializeClient({brand}, onSuccess, onFail) {
   const deliveries = database.findRecentOrActiveDeliveries(brand);
   const restaurants = database.findRestaurantsByBrandId(brand);
   const staff = database.findEnrolledUsersByBrand(brand)
-    .then((users) => {
-      const promises = users.map(user => findUserById(user).catch(onFail));
-      return Promise.all(promises);
+    .then((enrollments) => {
+      console.log("Has enrollments")
+      const promises = enrollments.map(
+        (enrollment) => database.findUserById(enrollment.user)
+          .then((user) => {
+            console.log("Filling users", enrollment)
+            user.restaurant = enrollment.restaurant;
+            user.position = enrollment.position;
+            return user;
+          })
+          .catch((error) => console.log(error))
+      )
+      return Promise.all(promises).catch((error) => console.log(error));
     });
   Promise.all([deliveries, restaurants, staff])
     .then(([deliveries, restaurants, staff]) => onSuccess({deliveries, restaurants, staff}))
-    .catch(onFail);
+    .catch((error) => console.log(error));
 }
 
 function createDelivery(delivery, onSuccess, onFail) {
