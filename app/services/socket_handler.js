@@ -73,12 +73,12 @@ async function createBrand(brand) {
 const initializeClientPromise = new Promise((resolve, reject) => {
   socket.once('initializeClient', (response) => {
     console.log('Response: ', response);
-    if (response.created) {
+    if (response.created || response.connected) {
       dataService.initialize(response.initialData);
       dataService.user.position = response.position;
       resolve();
     } else {
-      reject(new Error(response.error));
+      reject(response.error);
     }
   });
 });
@@ -93,6 +93,7 @@ async function connectToRestaurant(restaurant) {
   const response = initializeClientPromise;
   await socket.emit('connectToRestaurant', {user: dataService.user, restaurant});
   await response;
+  console.log('leave connectToRestaurant')
 }
 
 function disconnectFromRestaurant(data) {

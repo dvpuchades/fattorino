@@ -101,6 +101,7 @@ const FilterToggle = (props) => {
 const StaffListItem = (props) => {
   return (
     <ListItem principalText={props.data.name}
+    key={props.data._id}
     secondaryText={props.data.restaurant}
     iconName={props.data.status == "delivering" ? "bike" : "account-clock-outline"}
     iconColor={colors.primaryColor}

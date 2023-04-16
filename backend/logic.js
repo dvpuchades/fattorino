@@ -68,8 +68,7 @@ function connectToRestaurant({user, restaurant}, onSuccess, onFail) {
                   user: user._id,
                   brand,
                   restaurant,
-                  position: 'admin',
-                  initTime: new Date()
+                  position: 'admin'
                 })
               }
               onSuccess({brand, position});

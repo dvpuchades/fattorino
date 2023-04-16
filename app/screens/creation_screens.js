@@ -26,7 +26,6 @@ const CreateBrandScreen = ({navigation}) => {
 
 const CreateFirstRestaurantScreen = ({navigation}) => {
   const submitRestaurant = (restaurant) => {
-    console.log(restaurant);
     createRestaurant(restaurant)
       .then(() => navigation.navigate("DashboardScreen"))
       .catch((error) => console.log(error));

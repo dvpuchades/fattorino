@@ -22,8 +22,10 @@ const ScanQRCodeScreen = ({navigation}) => {
     setScanned(true);
     // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
     connectToRestaurant(data)
-      .then(() => navigation.navigate("DashboardScreen"))
-      .catch((error) => console.log(error));
+      .then(() => {
+        console.log("Connected to restaurant");
+        navigation.navigate("DashboardScreen")
+      });
   };
 
   if (hasPermission === null) {

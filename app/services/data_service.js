@@ -12,10 +12,17 @@ class DataService {
   }
 
   initialize(data) {
+    this.restaurants = data.restaurants;
+    const restaurantMap = new Map();
+    for (const r of this.restaurants) {
+      restaurantMap.set(r._id, r.name);
+    }
     this.deliveries = data.deliveries;
     this.trips = data.trips;
-    this.staff = data.staff;
-    this.restaurants = data.restaurants;
+    this.staff = data.staff.map(user => {
+      user.restaurant = restaurantMap.get(user.restaurant);
+      return user;
+    });
   }
 
   getStaff() {
