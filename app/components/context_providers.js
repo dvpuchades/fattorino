@@ -1,4 +1,4 @@
-import React, {useState, createContext} from "react";
+import React, {useState, useEffect, createContext} from "react";
 
 import dataService from "../services/data_service";
 
@@ -59,6 +59,7 @@ const DeliveryProvider = ({children}) => {
   };
 
   const refreshDeliveries = () => {
+    console.log('Refreshing deliveries', dataService.getDeliveries());
     setDeliveries(dataService.getDeliveries());
   };
 

@@ -8,7 +8,7 @@ import { register, authenticate } from '../services/socket_handler.js';
 
 const SignUpScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   return (
@@ -17,8 +17,8 @@ const SignUpScreen = ({navigation}) => {
         onChangeText={(value) => setEmail(value)}
         value={email}/>
       <Input my="5" variant="filled" placeholder="phone number"
-        onChangeText={(value) => setPhoneNumber(value)}
-        value={phoneNumber}/>
+        onChangeText={(value) => setPhone(value)}
+        value={phone}/>
       <Input my="5" variant="filled" placeholder="name"
         onChangeText={(value) => setName(value)}
         value={name}/>
@@ -27,7 +27,7 @@ const SignUpScreen = ({navigation}) => {
         value={password}/>
       <Button my="5" colorScheme="primary" width="100%"
         onPress={() => {
-            register({email, phoneNumber, name, password})
+            register({email, phone, name, password})
               .then(() => navigation.navigate('ScanQRCodeScreen'))
               .catch((error) => console.log(error));
           }

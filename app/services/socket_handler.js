@@ -9,6 +9,7 @@ socket.on('connect', () => {
 });
 
 socket.on('newDelivery', (data) => {
+  console.log('New delivery:', data);
   if (data.created) {
     dataService.createDelivery(data.delivery);
   } else {
@@ -31,7 +32,7 @@ async function register(user) {
         dataService.user = response.user;
         resolve();
       } else {
-        reject(new Error(response.error));
+        reject(response.error);
       }
     });
   });
@@ -46,7 +47,7 @@ async function authenticate({email, password}) {
         dataService.user = response.user;
         resolve();
       } else {
-        reject(new Error(response.error));
+        reject(response.error);
       }
     });
   });
@@ -62,7 +63,7 @@ async function createBrand(brand) {
         dataService.user.brand = response.brand;
         resolve();
       } else {
-        reject(new Error(response.error));
+        reject(response.error);
       }
     });
   });
@@ -102,20 +103,13 @@ function disconnectFromRestaurant(data) {
     if (response.disconnected) {
       console.log('Disconnected from restaurant:', response.enrollment);
     } else {
-      throw new Error(response.error);
+      throw response.error;
     }
   });
 }
 
-function newDelivery(data) {
-  socket.emit('newDelivery', data);
-  socket.once('newDelivery', (response) => {
-    if (response.created) {
-      console.log('New delivery created:', response.delivery);
-    } else {
-      throw new Error(response.error);
-    }
-  });
+function newDelivery(delivery) {
+  socket.emit('newDelivery', {delivery});
 }
 
 module.exports = {

@@ -7,22 +7,54 @@ class DataService {
     this.staff = [];
     this.restaurants = [];
 
+    this.restaurantMap = new Map();
+
+    this.subscriptors = new Map();
+
     this.deliveryFilters = new Map();
     this.staffFilters = new Map();
   }
 
   initialize(data) {
     this.restaurants = data.restaurants;
-    const restaurantMap = new Map();
+    this.restaurantMap = new Map();
     for (const r of this.restaurants) {
-      restaurantMap.set(r._id, r.name);
+      this.restaurantMap.set(r._id, r.name);
     }
-    this.deliveries = data.deliveries;
-    this.trips = data.trips;
+
     this.staff = data.staff.map(user => {
-      user.restaurant = restaurantMap.get(user.restaurant);
+      user.restaurant = this.restaurantMap.get(user.restaurant);
       return user;
     });
+    const staffMap = new Map();
+    for (const s of this.staff) {
+      staffMap.set(s._id, s.name);
+    }
+
+    this.deliveries = data.deliveries.map(delivery => {
+      delivery.restaurant = this.restaurantMap.get(delivery.restaurant);
+      delivery.uploadUser = staffMap.get(delivery.uploadUser);
+      delivery.cooker = staffMap.get(delivery.cooker);
+      delivery.courier = staffMap.get(delivery.courier);
+      return delivery;
+    });
+    
+    this.trips = data.trips;
+  }
+
+  subscribe(key, fn) {
+    if (!this.subscriptors.has(key)) {
+      this.subscriptors.set(key, new Set());
+    }
+    this.subscriptors.get(key).add(fn);
+  }
+
+  publish(key, data) {
+    if (this.subscriptors.has(key)) {
+      for (const fn of this.subscriptors.get(key)) {
+        fn(data);
+      }
+    }
   }
 
   getStaff() {
@@ -42,7 +74,10 @@ class DataService {
   }
 
   createDelivery(delivery) {
+    console.log('creating delivery');
     this.deliveries.push(delivery);
+    console.log('delivery was entered');
+    this.publish('newDelivery', delivery);
   }
 
   updateDelivery(delivery) {

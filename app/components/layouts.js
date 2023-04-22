@@ -48,6 +48,7 @@ const FilteredListLayout = (props) => {
     </Center>
     <Box flex="5">
     <FlatList px="4" data={props.data}
+    keyExtractor={(item, index) => index.toString()}
     contentContainerStyle={{ paddingBottom: 50 }}
     renderItem={
       ({item}) => props.renderItem({data: item, navigation: props.navigation})
