@@ -6,9 +6,10 @@ const { findRecentOrActiveDeliveries } = require('./database/delivery');
 database.connectToDatabase();
 
 function register(user, onSuccess, onFail) {
-  database.createUser(user.email, user.name, user.password)
+  console.log(user)
+  database.createUser(user)
     .then(onSuccess)
-    .catch(onFail);
+    .catch(error => console.log(error));
 }
 
 function auth({email, password}, onSuccess, onFail) {
@@ -22,13 +23,20 @@ function auth({email, password}, onSuccess, onFail) {
           onSuccess(user);
         })
     })
-    .catch(onFail);
+    .catch(error => onFail(error));
 }
 
 function createBrand(brand, onSuccess, onFail) {
   database.createBrand(brand.name, brand.creator)
-    .then(onSuccess)
-    .catch(onFail);
+    .then((newBrand) => {
+      database.createEnrollment({
+        user: brand.creator,
+        brand: newBrand._id,
+        position: 'admin'
+      })
+      onSuccess(newBrand)
+    })
+    .catch(error => onFail(error));
 }
 
 function createRestaurant(restaurant, onSuccess, onFail) {
@@ -48,7 +56,7 @@ function connectToRestaurant({user, restaurant}, onSuccess, onFail) {
           position: 'staff'
         })
           .then(() => {
-            onSuccess({brand, restaurant, position: "staff"})
+            onSuccess({brand: foundRestaurant.brand, restaurant, position: "staff"})
           })
           .catch(error => console.log(error))
       })
@@ -106,17 +114,27 @@ function connectToRestaurant({user, restaurant}, onSuccess, onFail) {
     .catch((error) => onFail(error));
 }
 
-function disconnectFromRestaurant({user, restaurant}, onSuccess, onFail) {
-  database.updateLastEnrollment(user._id, restaurant, {endTime: new Date()})
+function setLastEnrollmentEndTime(user, brand) {
+  return database.updateLastEnrollment(user, brand, {endTime: new Date()})
     .then((enrollment) => {
       if (!enrollment) {
-        onFail('User is not connected to restaurant');
+        return Promise.reject('User is not connected to restaurant');
       }
       else {
-        onSuccess();
+        return Promise.resolve();
       }
     })
-    .catch(onFail);
+    .catch((error) => Promise.reject(error));
+}
+
+function disconnectFromRestaurant({user, brand}, onSuccess, onFail) {
+  setLastEnrollmentEndTime(user, brand)
+    .then(() => onSuccess())
+    .catch((error) => onFail(error));
+}
+
+function disconnect(userId) {
+  return database.closeLastEnrollment(userId);
 }
 
 function initializeClient({brand}, onSuccess, onFail) {
@@ -124,11 +142,9 @@ function initializeClient({brand}, onSuccess, onFail) {
   const restaurants = database.findRestaurantsByBrandId(brand);
   const staff = database.findEnrolledUsersByBrand(brand)
     .then((enrollments) => {
-      console.log("Has enrollments")
       const promises = enrollments.map(
         (enrollment) => database.findUserById(enrollment.user)
           .then((user) => {
-            console.log("Filling users", enrollment)
             user.restaurant = enrollment.restaurant;
             user.position = enrollment.position;
             return user;
@@ -138,14 +154,31 @@ function initializeClient({brand}, onSuccess, onFail) {
       return Promise.all(promises).catch((error) => console.log(error));
     });
   Promise.all([deliveries, restaurants, staff])
-    .then(([deliveries, restaurants, staff]) => onSuccess({deliveries, restaurants, staff}))
+    .then(([deliveries, restaurants, staff]) => {
+      onSuccess({deliveries, restaurants, staff})
+    })
     .catch((error) => console.log(error));
+}
+
+function findEnrolledUsersByBrand(brand) {
+  return database.findEnrolledUsersByBrand(brand);
+}
+
+function findEnrolledExMatesForUser(user, onSuccess, onFail) {
+  database.findLastEnrollmentByUser(user)
+    .then(({brand}) => {
+      onSuccess(database.findEnrolledUsersByBrand(brand));
+    })
+    .catch((error) => onFail(error));
 }
 
 function createDelivery(delivery, onSuccess, onFail) {
   return database.createDelivery(delivery)
     .then(onSuccess)
-    .catch(onFail);
+    .catch(error => {
+      console.log(error);
+      onFail(error);
+    });
 }
 
 function updateDelivery(delivery, onSuccess, onFail) {
@@ -162,6 +195,9 @@ module.exports = {
   connectToRestaurant,
   disconnectFromRestaurant,
   initializeClient,
+  findEnrolledUsersByBrand,
+  findEnrolledExMatesForUser,
   createDelivery,
-  updateDelivery
+  updateDelivery,
+  disconnect
 };

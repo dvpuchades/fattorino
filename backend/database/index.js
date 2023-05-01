@@ -9,10 +9,12 @@ const {
 } = require('./restaurant');
 const {
   createEnrollment,
+  findLastEnrollmentByUser,
   findLastEnrollmentByUserAndBrand,
   findLastEnrollmentByUserAndRestaurant,
   findEnrolledUsersByBrand,
-  updateLastEnrollment
+  updateLastEnrollment,
+  closeLastEnrollment
 } = require('./enrollment');
 const {
   createDelivery,
@@ -36,10 +38,12 @@ module.exports = {
   findRestaurantsByBrandId,
   deleteRestaurant,
   createEnrollment,
+  findLastEnrollmentByUser,
   findLastEnrollmentByUserAndBrand,
   findLastEnrollmentByUserAndRestaurant,
   findEnrolledUsersByBrand,
   updateLastEnrollment,
+  closeLastEnrollment,
   createDelivery,
   findDeliveryById,
   findRecentOrActiveDeliveries,

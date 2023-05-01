@@ -20,21 +20,20 @@ async function findRecentOrActiveDeliveries(brand) {
   const now = new Date();
   const fourHoursAgo = new Date(now - 4 * 60 * 60 * 1000); // 4 hours ago
 
-  const recentDeliveries = await Delivery.find({
-    uploadTime: { $gte: fourHoursAgo },
+  const deliveries = await Delivery.find({
+    $or: [
+      { initTime: { $gte: fourHoursAgo } },
+      { status: { $ne: 'shipped' } }
+    ],
     brand
   }).exec();
 
-  const activeDeliveries = await Delivery.find({
-    status: { $ne: 'shipped' }
-  }).exec();
-
-  return [...recentDeliveries, ...activeDeliveries];
+  return deliveries;
 }
 
 // Update delivery properties if they are defined in the input object
-async function updateDelivery({ id, status, endTime, cooker, courier, readyTime, departureTime }) {
-  const delivery = await Delivery.findById(id);
+async function updateDelivery({ _id, status, endTime, cooker, courier, readyTime, departureTime }) {
+  const delivery = await Delivery.findById(_id);
   if (!delivery) {
     throw new Error('Delivery not found');
   }
@@ -62,8 +61,8 @@ async function updateDelivery({ id, status, endTime, cooker, courier, readyTime,
 
 
 // Delete a delivery
-async function deleteDelivery(id) {
-  return Delivery.findByIdAndDelete(id);
+async function deleteDelivery(_id) {
+  return Delivery.findByIdAndDelete(_id);
 }
 
 module.exports = {

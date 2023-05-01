@@ -30,7 +30,7 @@ async function authenticateUser(email, password) {
 
 async function findUserById(id) {
   // return user without hashed password
-  const user = await User.findById(id).select('-hashedPassword');
+  const user = await User.findById(id).select('-hashedPassword').lean();
   return user;
 }
 

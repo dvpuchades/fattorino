@@ -6,8 +6,9 @@ const restaurantSchema = new Schema({
   address: { type: String, required: true },
   city: { type: String, required: true },
   postcode: { type: String, required: true },
-  creator: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  created: { type: Date, default: Date.now }
+  creatorId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  creatorName: { type: String, required: true },
+  creationDate: { type: Date, default: Date.now }
 });
 
 const Restaurant = model('Restaurant', restaurantSchema);

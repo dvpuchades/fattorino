@@ -1,7 +1,7 @@
 const Restaurant = require('./models/restaurant.js');
 
-async function createRestaurant({brand, name, address, city, postcode, creator, created}) {
-  const restaurant = new Restaurant({brand, name, address, city, postcode, creator, created});
+async function createRestaurant({brand, name, address, city, postcode, creatorId, creatorName, creationDate}) {
+  const restaurant = new Restaurant({brand, name, address, city, postcode, creatorId, creatorName, creationDate});
   return restaurant.save();
 }
 
