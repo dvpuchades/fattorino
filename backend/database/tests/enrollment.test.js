@@ -70,10 +70,10 @@ describe('Enrollment controller', () => {
         position: 'manager',
         endTime: new Date()
       };
-      const enrollment = await updateLastEnrollment(userId, restaurantId, update);
+      const enrollment = await updateLastEnrollment(userId, brandId, update);
       expect(enrollment).toMatchObject({
         user: userId,
-        restaurant: restaurantId,
+        brand: brandId,
         position: 'manager',
         endTime: update.endTime
       });
