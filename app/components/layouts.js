@@ -77,7 +77,6 @@ const CreateRestaurantForm = (props) => {
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [postcode, setPostcode] = useState('');
-  const { user } = useContext(UserContext);
   
   const handleSubmit = () => {
     const restaurant = new Restaurant(

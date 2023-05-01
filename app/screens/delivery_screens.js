@@ -28,9 +28,23 @@ import { useIsFocused } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Pressable, ScrollView } from "react-native";
 import { DeliveryContext, UserContext } from "../components/context_providers.js";
-import dataService from "../services/data_service.js";
+import DataService from "../services/data_service.js";
 import { DeliveryCityFilter, DeliveryStatusFilter, DeliveryPostcodeFilter, DeliveryCourierFilter, DeliveryRestaurantFilter } from "../components/filters.js";
-import { newDelivery } from "../services/socket_handler.js";
+import { SocketContext } from "../services/socket_provider.js";
+
+const formatDate = (date) => {
+  // asuming date is a string in the format "2023-05-20T12:00:00.000Z"
+  date = new Date(date);
+  const hoursAndMinutes = date.getHours() + ':' + date.getMinutes();
+  const day = date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  return hoursAndMinutes + ' on ' + day;
+};
+
 
 const DeliveryList = ({navigation}) => {
   const statusDisclose = useDisclose();
@@ -40,11 +54,12 @@ const DeliveryList = ({navigation}) => {
   const restaurantDisclose = useDisclose();
 
   const { deliveries, refreshDeliveries } = useContext(DeliveryContext);
-  // useEffect(() => {
-  //   dataService.subscribe('newDelivery', refreshDeliveries);
-  // }, [deliveries]);
 
-  const filters = dataService.getDeliveryFilters();
+  useEffect(() => {
+    refreshDeliveries();
+  }, []);
+
+  const filters = DataService.getDeliveryFilters();
   return (
     <Box flex={1}>
       <FilteredListLayout title="Deliveries"
@@ -125,15 +140,15 @@ const DeliveryProfile = ({route}) => {
           <Tag icon="phone" text={delivery.customerPhone}/> : null }
         <Tag icon="silverware-fork-knife" text={delivery.restaurant}/>
         <Tag icon="upload" text={"Uploaded by " + delivery.uploadUser}/>
-        <Tag icon="clock" text={"Submitted at " + delivery.initTime}/>
+        <Tag icon="clock" text={"Submitted at " + formatDate(delivery.initTime)}/>
         { delivery.readyBy ?
           <Tag icon="chef-hat" text={"Prepared by " + delivery.readyBy}/> : null }
         { delivery.readyTime ?
-          <Tag icon="clock" text={"Prepared at " + delivery.readyTime}/> : null }
+          <Tag icon="clock" text={"Prepared at " + formatDate(delivery.readyTime)}/> : null }
         { delivery.courier ?
           <Tag icon="bike" text={"Delivered by " + delivery.courier}/> : null } 
         { delivery.departureTime ?
-          <Tag icon="clock" text={"Departure at " + delivery.departureTime}/> : null }
+          <Tag icon="clock" text={"Departure at " + formatDate(delivery.departureTime)}/> : null }
       </Box>
       <ButtonByStatus delivery={delivery}/>
     </ProfileLayout>
@@ -141,18 +156,25 @@ const DeliveryProfile = ({route}) => {
 };
 
 const ButtonByStatus = ({delivery}) => {
-  const { user } = useContext(UserContext);
-  const { updateDelivery } = useContext(DeliveryContext);
+  const { user } = DataService;
+  // const { updateDelivery } = useContext(DeliveryContext);
+  const { socket } = useContext(SocketContext);
+
+  const updateDelivery = (delivery) => {
+    socket.emit("updateDelivery", {delivery});
+  };
+
+
   const handleReady = () => {
     delivery.status = "ready";
-    delivery.readyBy = user.name;
+    delivery.readyBy = user._id;
     delivery.readyTime = new Date().toLocaleString();
     updateDelivery(delivery);
   };
 
   const handleDelivering = () => {
     delivery.status = "delivering";
-    delivery.courier = user.name;
+    delivery.courier = user._id;
     delivery.departureTime = new Date().toLocaleString();
     updateDelivery(delivery);
   };
@@ -198,12 +220,12 @@ const PostDeliveryScreen = ({navigation}) => {
   const [amount, setAmount] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
-  const [restaurant, setRestaurant] = useState(dataService.user.restaurant ?? '');
+  const [restaurant, setRestaurant] = useState(DataService.user.restaurant ?? '');
   
-  const { refreshDeliveries } = useContext(DeliveryContext);
+  const { createDelivery } = useContext(SocketContext);
 
   const handleSubmit = () => {
-    newDelivery({
+    createDelivery({
       address: address,
       city: city,
       postcode: postcode,
@@ -211,10 +233,10 @@ const PostDeliveryScreen = ({navigation}) => {
       customerName: customerName,
       customerPhone: customerPhone,
       restaurant: restaurant,
-      uploadUser: dataService.user._id,
+      brand: DataService.user.brand,
+      uploadUser: DataService.user._id,
       status: "preparing",
     });
-    refreshDeliveries();
     navigation.navigate("DeliveryList");
   }
 
@@ -245,7 +267,7 @@ const PostDeliveryScreen = ({navigation}) => {
         selectedValue={restaurant}
         onValueChange={(id) => setRestaurant(id)}
       >
-        { Array.from(dataService.restaurantMap).map(
+        { Array.from(DataService.restaurantMap).map(
           ([id, name]) => {
             return (<Select.Item label={name} value={id} key={id}/>)
           })

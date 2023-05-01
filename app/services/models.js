@@ -1,20 +1,21 @@
-import dataService from "./data_service";
+import DataService from "./data_service";
 
 class Brand {
   constructor(name) {
     this.name = name;
-    this.creator = dataService.user._id;
+    this.creator = DataService.user._id;
   }
 }
 
 class Restaurant {
   constructor(name, address, city, postcode) {
     this.name = name;
-    this.brand = dataService.user.brand._id;
+    this.brand = DataService.user.brand;
     this.address = address;
     this.city = city;
     this.postcode = postcode;
-    this.creator = dataService.user._id;
+    this.creatorId = DataService.user._id;
+    this.creatorName = DataService.user.name;
   }
 }
 

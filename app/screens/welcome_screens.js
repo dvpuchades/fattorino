@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Input,
   Button
 } from "native-base";
 import { FormLayout } from '../components/layouts.js';
-import { register, authenticate } from '../services/socket_handler.js';
+import { SocketContext } from '../services/socket_provider.js';
+import { UserContext } from '../components/context_providers.js';
+import DataService from '../services/data_service.js';
 
 const SignUpScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const { register } = useContext(SocketContext);
   return (
     <FormLayout description="Join us and improve your efficency when shipping.">
       <Input my="5" variant="filled" placeholder="email"
@@ -28,7 +31,10 @@ const SignUpScreen = ({navigation}) => {
       <Button my="5" colorScheme="primary" width="100%"
         onPress={() => {
             register({email, phone, name, password})
-              .then(() => navigation.navigate('ScanQRCodeScreen'))
+              .then(() => {
+                setUser(DataService.user);
+                navigation.navigate('ScanQRCodeScreen')
+              })
               .catch((error) => console.log(error));
           }
         }
@@ -46,6 +52,8 @@ const SignUpScreen = ({navigation}) => {
 const LogInScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { setUser } = useContext(UserContext);
+  const { authenticate } = useContext(SocketContext);
   return (
     <FormLayout description="Log in and start delivering.">
       <Input variant="filled" placeholder="email" my="5"
@@ -57,7 +65,10 @@ const LogInScreen = ({navigation}) => {
       <Button colorScheme="primary" width="100%" my="5"
         onPress={() => {
             authenticate({email, password})
-              .then(() => navigation.navigate('ScanQRCodeScreen'))
+              .then(() => {
+                setUser(DataService.user);
+                navigation.navigate('ScanQRCodeScreen');
+              })
               .catch((error) => console.log(error));
           }
         }

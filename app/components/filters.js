@@ -21,8 +21,8 @@ import {
 } from "native-base";
 import { colors } from '../constants.js';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import dataService from "../services/data_service.js";
-import { DeliveryContext, DeliveryProvider, StaffContext } from "../components/context_providers.js";
+import DataService from "../services/data_service.js";
+import { DeliveryContext, StaffContext } from "../components/context_providers.js";
 
 const FilterCheckbox = (props) => {
   const [checked, setChecked] = useState(props.default || false);
@@ -48,7 +48,7 @@ const FilterCheckbox = (props) => {
 
 const StaffRestaurantFilter = ({ isOpen, onClose }) => {
   const { refreshStaff, setFilters } = useContext(StaffContext);
-  const restaurants = dataService.restaurants.map((r) => r.name);
+  const restaurants = DataService.restaurants.map((r) => r.name);
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
       <Actionsheet.Content>
@@ -56,15 +56,15 @@ const StaffRestaurantFilter = ({ isOpen, onClose }) => {
           restaurants.map((restaurant) => {
             return (
               <FilterCheckbox key={restaurant} onCheck={() => {
-                dataService.removeStaffFilter("restaurant.remove" + restaurant);
+                DataService.removeStaffFilter("restaurant.remove" + restaurant);
                 refreshStaff();
-                setFilters(dataService.getStaffFilters());
+                setFilters(DataService.getStaffFilters());
               }}
               onUncheck={() => {
-                dataService.addStaffFilter("restaurant.remove" + restaurant, (s) => s.restaurant !== restaurant);
+                DataService.addStaffFilter("restaurant.remove" + restaurant, (s) => s.restaurant !== restaurant);
                 refreshStaff();
-                setFilters(dataService.getStaffFilters());
-              }} default={!dataService.staffFilters.has("restaurant.remove" + restaurant)}
+                setFilters(DataService.getStaffFilters());
+              }} default={!DataService.staffFilters.has("restaurant.remove" + restaurant)}
               >{restaurant}</FilterCheckbox>
             );
           })
@@ -80,48 +80,48 @@ const DeliveryStatusFilter = ({ isOpen, onClose }) => {
     <Actionsheet isOpen={isOpen} onClose={onClose}>
       <Actionsheet.Content>
         <FilterCheckbox onCheck={() => {
-          dataService.removeDeliveryFilter("status.removePreparing");
+          DataService.removeDeliveryFilter("status.removePreparing");
           refreshDeliveries();
-          setFilters(dataService.getDeliveryFilters());
+          setFilters(DataService.getDeliveryFilters());
         }}
         onUncheck={() => {
-          dataService.addDeliveryFilter("status.removePreparing", (d) => d.status !== "preparing");
+          DataService.addDeliveryFilter("status.removePreparing", (d) => d.status !== "preparing");
           refreshDeliveries();
-          setFilters(dataService.getDeliveryFilters());
-        }} default={!dataService.deliveryFilters.has("status.removePreparing")}
+          setFilters(DataService.getDeliveryFilters());
+        }} default={!DataService.deliveryFilters.has("status.removePreparing")}
         >preparing</FilterCheckbox>
         <FilterCheckbox onCheck={() => {
-          dataService.removeDeliveryFilter("status.removeReady");
+          DataService.removeDeliveryFilter("status.removeReady");
           refreshDeliveries();
-          setFilters(dataService.getDeliveryFilters());
+          setFilters(DataService.getDeliveryFilters());
         }}
         onUncheck={() => {
-          dataService.addDeliveryFilter("status.removeReady", (d) => d.status !== "ready");
+          DataService.addDeliveryFilter("status.removeReady", (d) => d.status !== "ready");
           refreshDeliveries();
-          setFilters(dataService.getDeliveryFilters());
-        }} default={!dataService.deliveryFilters.has("status.removeReady")}
+          setFilters(DataService.getDeliveryFilters());
+        }} default={!DataService.deliveryFilters.has("status.removeReady")}
         >ready</FilterCheckbox>
         <FilterCheckbox onCheck={() => {
-          dataService.removeDeliveryFilter("status.removeDelivering");
+          DataService.removeDeliveryFilter("status.removeDelivering");
           refreshDeliveries();
-          setFilters(dataService.getDeliveryFilters());
+          setFilters(DataService.getDeliveryFilters());
         }}
         onUncheck={() => {
-          dataService.addDeliveryFilter("status.removeDelivering", (d) => d.status !== "delivering");
+          DataService.addDeliveryFilter("status.removeDelivering", (d) => d.status !== "delivering");
           refreshDeliveries();
-          setFilters(dataService.getDeliveryFilters());
-        }} default={!dataService.deliveryFilters.has("status.removeDelivering")}
+          setFilters(DataService.getDeliveryFilters());
+        }} default={!DataService.deliveryFilters.has("status.removeDelivering")}
         >delivering</FilterCheckbox>
         <FilterCheckbox onCheck={() => {
-          dataService.removeDeliveryFilter("status.removeShipped");
+          DataService.removeDeliveryFilter("status.removeShipped");
           refreshDeliveries();
-          setFilters(dataService.getDeliveryFilters());
+          setFilters(DataService.getDeliveryFilters());
         }}
         onUncheck={() => {
-          dataService.addDeliveryFilter("status.removeShipped", (d) => d.status !== "shipped");
+          DataService.addDeliveryFilter("status.removeShipped", (d) => d.status !== "shipped");
           refreshDeliveries();
-          setFilters(dataService.getDeliveryFilters());
-        }} default={!dataService.deliveryFilters.has("status.removeShipped")}
+          setFilters(DataService.getDeliveryFilters());
+        }} default={!DataService.deliveryFilters.has("status.removeShipped")}
         >shipped</FilterCheckbox>
       </Actionsheet.Content>
     </Actionsheet>
@@ -130,7 +130,7 @@ const DeliveryStatusFilter = ({ isOpen, onClose }) => {
 
 const DeliveryCityFilter = ({ isOpen, onClose }) => {
   const { refreshDeliveries, setFilters } = useContext(DeliveryContext);
-  const cities = Array.from(dataService.getDeliveryCities());
+  const cities = Array.from(DataService.getDeliveryCities());
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
       <Actionsheet.Content>
@@ -138,15 +138,15 @@ const DeliveryCityFilter = ({ isOpen, onClose }) => {
           cities.map((city) => {
             return (
               <FilterCheckbox key={city} onCheck={() => {
-                dataService.removeDeliveryFilter("city.remove" + city);
+                DataService.removeDeliveryFilter("city.remove" + city);
                 refreshDeliveries();
-                setFilters(dataService.getDeliveryFilters());
+                setFilters(DataService.getDeliveryFilters());
               }}
               onUncheck={() => {
-                dataService.addDeliveryFilter("city.remove" + city, (d) => d.city !== city);
+                DataService.addDeliveryFilter("city.remove" + city, (d) => d.city !== city);
                 refreshDeliveries();
-                setFilters(dataService.getDeliveryFilters());
-              }} default={!dataService.deliveryFilters.has("city.remove" + city)}
+                setFilters(DataService.getDeliveryFilters());
+              }} default={!DataService.deliveryFilters.has("city.remove" + city)}
               >{city}</FilterCheckbox>
             );
           })
@@ -158,7 +158,7 @@ const DeliveryCityFilter = ({ isOpen, onClose }) => {
 
 const DeliveryPostcodeFilter = ({ isOpen, onClose }) => {
   const { refreshDeliveries, setFilters } = useContext(DeliveryContext);
-  const postcodes = Array.from(dataService.getDeliveryPostcodes());
+  const postcodes = Array.from(DataService.getDeliveryPostcodes());
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
       <Actionsheet.Content>
@@ -166,15 +166,15 @@ const DeliveryPostcodeFilter = ({ isOpen, onClose }) => {
           postcodes.map((postcode) => {
             return (
               <FilterCheckbox key={postcode} onCheck={() => {
-                dataService.removeDeliveryFilter("postcode.remove" + postcode);
+                DataService.removeDeliveryFilter("postcode.remove" + postcode);
                 refreshDeliveries();
-                setFilters(dataService.getDeliveryFilters());
+                setFilters(DataService.getDeliveryFilters());
               }}
               onUncheck={() => {
-                dataService.addDeliveryFilter("postcode.remove" + postcode, (d) => d.postcode !== postcode);
+                DataService.addDeliveryFilter("postcode.remove" + postcode, (d) => d.postcode !== postcode);
                 refreshDeliveries();
-                setFilters(dataService.getDeliveryFilters());
-              }} default={!dataService.deliveryFilters.has("postcode.remove" + postcode)}
+                setFilters(DataService.getDeliveryFilters());
+              }} default={!DataService.deliveryFilters.has("postcode.remove" + postcode)}
               >{postcode}</FilterCheckbox>
             );
           })
@@ -186,7 +186,7 @@ const DeliveryPostcodeFilter = ({ isOpen, onClose }) => {
 
 const DeliveryCourierFilter = ({ isOpen, onClose }) => {
   const { refreshDeliveries, setFilters } = useContext(DeliveryContext);
-  const couriers = Array.from(dataService.getDeliveryCouriers());
+  const couriers = Array.from(DataService.getDeliveryCouriers());
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
       <Actionsheet.Content>
@@ -194,15 +194,15 @@ const DeliveryCourierFilter = ({ isOpen, onClose }) => {
           couriers.map((courier) => {
             return (
               <FilterCheckbox key={courier} onCheck={() => {
-                dataService.removeDeliveryFilter("courier.remove" + courier);
+                DataService.removeDeliveryFilter("courier.remove" + courier);
                 refreshDeliveries();
-                setFilters(dataService.getDeliveryFilters());
+                setFilters(DataService.getDeliveryFilters());
               }}
               onUncheck={() => {
-                dataService.addDeliveryFilter("courier.remove" + courier, (d) => d.courier !== courier);
+                DataService.addDeliveryFilter("courier.remove" + courier, (d) => d.courier !== courier);
                 refreshDeliveries();
-                setFilters(dataService.getDeliveryFilters());
-              }} default={!dataService.deliveryFilters.has("courier.remove" + courier)}
+                setFilters(DataService.getDeliveryFilters());
+              }} default={!DataService.deliveryFilters.has("courier.remove" + courier)}
               >{courier}</FilterCheckbox>
             );
           })
@@ -214,7 +214,7 @@ const DeliveryCourierFilter = ({ isOpen, onClose }) => {
 
 const DeliveryRestaurantFilter = ({ isOpen, onClose }) => {
   const { refreshDeliveries, setFilters } = useContext(DeliveryContext);
-  const restaurants = dataService.restaurants.map((r) => r.name);
+  const restaurants = DataService.restaurants.map((r) => r.name);
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
       <Actionsheet.Content>
@@ -222,15 +222,15 @@ const DeliveryRestaurantFilter = ({ isOpen, onClose }) => {
           restaurants.map((restaurant) => {
             return (
               <FilterCheckbox key={restaurant} onCheck={() => {
-                dataService.removeDeliveryFilter("restaurant.remove" + restaurant);
+                DataService.removeDeliveryFilter("restaurant.remove" + restaurant);
                 refreshDeliveries();
-                setFilters(dataService.getDeliveryFilters());
+                setFilters(DataService.getDeliveryFilters());
               }}
               onUncheck={() => {
-                dataService.addDeliveryFilter("restaurant.remove" + restaurant, (d) => d.restaurant !== restaurant);
+                DataService.addDeliveryFilter("restaurant.remove" + restaurant, (d) => d.restaurant !== restaurant);
                 refreshDeliveries();
-                setFilters(dataService.getDeliveryFilters());
-              }} default={!dataService.deliveryFilters.has("restaurant.remove" + restaurant)}
+                setFilters(DataService.getDeliveryFilters());
+              }} default={!DataService.deliveryFilters.has("restaurant.remove" + restaurant)}
               >{restaurant}</FilterCheckbox>
             );
           })

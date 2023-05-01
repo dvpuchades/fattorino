@@ -1,40 +1,24 @@
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import { server } from '../environment.js';
+import DataService from './data_service.js';
 
 const SocketContext = createContext(null);
 
 const SocketProvider = ({ children }) => {
   const socket = io(server.uri);
 
+  const getDeliveries = () => {
+    return DataService.getDeliveries();
+  };
+
   useEffect(() => {
     socket.on('connect', () => {
       console.log('Connected to server:', socket.id);
     });
+
     return () => {
       socket.off('connect');
-    };
-  }, [socket]);
-
-  useEffect(() => {
-    socket.on('newDelivery', (data) => {
-      console.log('New delivery:', data);
-      if (data.created) {
-        // TODO: handle new delivery
-      } else {
-        console.log('Error creating delivery:', data.error);
-      }
-    });
-    socket.on('updateDelivery', (data) => {
-      if (data.updated) {
-        // TODO: handle updated delivery
-      } else {
-        console.log('Error updating delivery:', data.error);
-      }
-    });
-    return () => {
-      socket.off('newDelivery');
-      socket.off('updateDelivery');
     };
   }, [socket]);
 
@@ -51,7 +35,7 @@ const SocketProvider = ({ children }) => {
     const response = new Promise ((resolve, reject) => {
       socket.once('register', (response) => {
         if (response.registered) {
-          dataService.user = response.user;
+          DataService.user = response.user;
           resolve();
         } else {
           reject(response.error);
@@ -66,7 +50,7 @@ const SocketProvider = ({ children }) => {
     const response = new Promise((resolve, reject) => {
       socket.once('auth', (response) => {
         if (response.authenticated) {
-          dataService.user = response.user;
+          DataService.user = response.user;
           resolve();
         } else {
           reject(response.error);
@@ -82,7 +66,7 @@ const SocketProvider = ({ children }) => {
     const response = new Promise((resolve, reject) => {
       socket.once('createBrand', (response) => {
         if (response.created) {
-          dataService.user.brand = response.brand;
+          DataService.user.brand = response.brand;
           resolve();
         } else {
           reject(response.error);
@@ -93,43 +77,82 @@ const SocketProvider = ({ children }) => {
     await response;
   }
 
+  const initializeClient = async () => {
+    const incomingData = new Promise((resolve, reject) => {
+      socket.once('initializeClient', (response) => {
+        if (response.created || response.connected) {
+          DataService.initialize(response.initialData);
+          DataService.user.position = response.position;
+          DataService.user.restaurant = response.restaurant;
+          DataService.user.brand = response.brand;
+          resolve();
+        } else {
+          reject(response.error);
+        }
+      });
+    });
+    await incomingData;
+  }
+
+  const createFirstRestaurant = async (restaurant) => {
+    await socket.emit('createFirstRestaurant', {restaurant});
+    await initializeClientPromise();
+  }
+
   const createRestaurant = async (restaurant) => {
-    const response = initializeClientPromise;
     await socket.emit('createRestaurant', {restaurant});
-    await response;
   }
 
   const connectToRestaurant = async (restaurant) => {
-    const response = initializeClientPromise;
-    await socket.emit('connectToRestaurant', {user: dataService.user, restaurant});
-    await response;
-    console.log('leave connectToRestaurant')
+    await socket.emit('connectToRestaurant', {user: DataService.user, restaurant});
+    await initializeClientPromise();
   }
+
+  const disconnectFromRestaurant = async () => {
+    socket.emit('disconnectFromRestaurant', {
+      user: DataService.user._id,
+      brand: DataService.user.brand
+    });
+  };
 
   const createDelivery = async (delivery) => {
     socket.emit('newDelivery', {delivery});
   }
 
+  const useSocketEvent = (eventName, handler) => {
+    const { socket } = useContext(SocketContext);
+  
+    useEffect(() => {
+      if (socket.hasListeners(eventName)) {
+        console.log('Socket already has listener for event:', eventName);
+        return;
+      }
+      socket.on(eventName, handler);
+      // Clean up the event listener when the component unmounts
+      return () => {
+        socket.off(eventName, handler);
+      };
+    }, [eventName, handler, socket]);
+  };
+
   return (
     <SocketContext.Provider value={{
+      socket,
       register,
       authenticate,
       createBrand,
+      createFirstRestaurant,
       createRestaurant,
       connectToRestaurant,
-      createDelivery
+      disconnectFromRestaurant,
+      createDelivery,
+      getDeliveries,
+      useSocketEvent
     }}>
       {children}
     </SocketContext.Provider>
   );
 };
 
-const useSocket = () => {
-  const socket = useContext(SocketContext);
-  if (!socket) {
-    throw new Error('useSocket must be used within a SocketProvider');
-  }
-  return socket;
-};
 
-export { SocketProvider, useSocket };
+export { SocketContext, SocketProvider };
