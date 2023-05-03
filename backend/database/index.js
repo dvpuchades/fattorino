@@ -20,6 +20,7 @@ const {
   createDelivery,
   findDeliveryById,
   findRecentOrActiveDeliveries,
+  findTodaysDeliveriesForCourier,
   updateDelivery,
   deleteDelivery
 } = require('./delivery');
@@ -47,6 +48,7 @@ module.exports = {
   createDelivery,
   findDeliveryById,
   findRecentOrActiveDeliveries,
+  findTodaysDeliveriesForCourier,
   updateDelivery,
   deleteDelivery
 };

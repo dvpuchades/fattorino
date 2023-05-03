@@ -137,20 +137,38 @@ function disconnect(userId) {
   return database.closeLastEnrollment(userId);
 }
 
+async function getUser(userId) {
+  const user = await database.findUserById(userId);
+  const deliveries = await database.findTodaysDeliveriesForCourier(userId);
+  const currentDeliveries = deliveries.filter((delivery) => delivery.status !== 'shipped');
+  if(currentDeliveries.length > 0) {
+    const initTime = new Date(Math.min(
+      ...currentDeliveries.map((delivery) => delivery.departureTime)
+    ));
+    user.currentTrip = {
+      initTime,
+      deliveries: currentDeliveries
+    };
+  }
+  user.numberOfDeliveries = deliveries.length;
+  user.balance = currentDeliveries.reduce(
+    (accumulator, delivery) => accumulator + delivery.amount, 0);
+  return user;
+}
+
 function initializeClient({brand}, onSuccess, onFail) {
   const deliveries = database.findRecentOrActiveDeliveries(brand);
   const restaurants = database.findRestaurantsByBrandId(brand);
   const staff = database.findEnrolledUsersByBrand(brand)
     .then((enrollments) => {
       const promises = enrollments.map(
-        (enrollment) => database.findUserById(enrollment.user)
+        (enrollment) => getUser(enrollment.user)
           .then((user) => {
             user.restaurant = enrollment.restaurant;
             user.position = enrollment.position;
             return user;
           })
-          .catch((error) => console.log(error))
-      )
+      );
       return Promise.all(promises).catch((error) => console.log(error));
     });
   Promise.all([deliveries, restaurants, staff])

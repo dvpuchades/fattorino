@@ -31,6 +31,20 @@ async function findRecentOrActiveDeliveries(brand) {
   return deliveries;
 }
 
+// Find today's deliveries for courier
+async function findTodaysDeliveriesForCourier(courier) {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+
+  const deliveries = await Delivery.find({
+    courier,
+    initTime: { $gte: today, $lt: tomorrow }
+  }).exec();
+
+  return deliveries;
+}
+
 // Update delivery properties if they are defined in the input object
 async function updateDelivery({ _id, status, endTime, cooker, courier, readyTime, departureTime }) {
   const delivery = await Delivery.findById(_id);
@@ -69,6 +83,7 @@ module.exports = {
   createDelivery,
   findDeliveryById,
   findRecentOrActiveDeliveries,
+  findTodaysDeliveriesForCourier,
   updateDelivery,
   deleteDelivery
 };
