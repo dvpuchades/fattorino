@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Pressable, ScrollView } from "react-native";
 import QRCode from "react-native-qrcode-svg";
-import React, {useState, useEffect, createContext} from "react";
+import React, {useEffect} from "react";
 import {
   NativeBaseProvider,
   extendTheme,
@@ -55,8 +55,9 @@ import {
   PostDeliveryScreen,
   TripList
 } from "../screens/delivery_screens.js";
-import { OptionList, ShowQRCodeScreen, CreateRestaurantScreen, RestaurantList, RestaurantProfile, ReportScreen, VersionScreen } from "../screens/options_screens.js";
-import { StaffProvider, DeliveryProvider, RestaurantProvider } from "../components/context_providers.js";
+import { OptionList, CreateRestaurantScreen, RestaurantList, RestaurantProfile, ReportScreen, VersionScreen } from "../screens/options_screens.js";
+import { StaffProvider, DeliveryProvider, RestaurantProvider, UserContext } from "../components/context_providers.js";
+import DataService from '../services/data_service.js';
 
 // Set stack navigator
 const Tab = createBottomTabNavigator();
@@ -67,11 +68,12 @@ const OptionStack = createNativeStackNavigator();
 
 const DashboardScreen = ({navigation}) => {
   useEffect(
-    () =>
+    () => {
       navigation.addListener('beforeRemove', (e) => {
         // Prevent default behavior of leaving the screen
         e.preventDefault();
-      }),
+      });
+    },
     [navigation]
   );
   return (
@@ -145,7 +147,6 @@ const OptionsScreen = () => {
         <OptionStack.Screen name="TripList" component={TripList}/>
         <OptionStack.Screen name="RestaurantList" component={RestaurantList}/>
         <OptionStack.Screen name="RestaurantProfile" component={RestaurantProfile}/>
-        <OptionStack.Screen name="ShowQRCodeScreen" component={ShowQRCodeScreen}/>
         <OptionStack.Screen name="CreateRestaurantScreen" component={CreateRestaurantScreen}/>
         <OptionStack.Screen name="ScanQRCodeScreen" component={ScanQRCodeScreen}/>
         <OptionStack.Screen name="ReportScreen" component={ReportScreen}/>

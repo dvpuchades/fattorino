@@ -1,14 +1,19 @@
-import React, {useState, createContext} from "react";
-
-import dataService from "../services/data_service";
+import React, {useState, createContext, useContext} from "react";
+import {SocketContext} from "../services/socket_provider.js";
+import DataService from "../services/data_service";
 
 const UserContext = createContext();
 
 const UserProvider = ({children}) => {
-  const [user, setUser] = useState(dataService.user);
-
+  const [user, setUser] = useState(DataService.user);
+  const [needsRestaurant, setNeedsRestaurant] = useState(true);
   return (
-    <UserContext.Provider value={{user, setUser}}>
+    <UserContext.Provider value={{
+      user,
+      setUser,
+      needsRestaurant,
+      setNeedsRestaurant
+    }}>
       {children}
     </UserContext.Provider>
   );
@@ -17,11 +22,17 @@ const UserProvider = ({children}) => {
 const StaffContext = createContext();
 
 const StaffProvider = ({children}) => {
-  const [staff, setStaff] = useState(dataService.getStaff());
-  const [filters, setFilters] = useState(dataService.getStaffFilters());
+  const [staff, setStaff] = useState(DataService.getStaff());
+  const [filters, setFilters] = useState(DataService.getStaffFilters());
+  const { useSocketEvent } = useContext(SocketContext);
+
+  useSocketEvent('updateStaff', ({staff}) => {
+    DataService.setStaff(staff);
+    refreshStaff();
+  });
 
   const refreshStaff = () => {
-    setStaff(dataService.getStaff());
+    setStaff(DataService.getStaff());
   };
 
   return (
@@ -40,17 +51,42 @@ const StaffProvider = ({children}) => {
 const DeliveryContext = createContext();
 
 const DeliveryProvider = ({children}) => {
-  const [deliveries, setDeliveries] = useState(dataService.getDeliveries());
-  const [filters, setFilters] = useState(dataService.getDeliveryFilters());
-  const [trips, setTrips] = useState(dataService.getTrips());
+  const [deliveries, setDeliveries] = useState([]);
+  const [filters, setFilters] = useState(DataService.getDeliveryFilters());
+
+  const [trips, setTrips] = useState(DataService.getTrips());
+
+  const { useSocketEvent } = useContext(SocketContext);
+
+  useSocketEvent('newDelivery', (data) => {
+    console.log('New delivery is being called now');
+    console.log(data);
+    if (data.created) {
+      addDelivery(data.delivery);
+    } else {
+      console.log('Error creating delivery:', data.error);
+    }
+  });
+
+  useSocketEvent('updateDelivery', (data) => {
+    if (data.updated) {
+      DataService.updateDelivery(data.delivery);
+      updateDelivery(data.delivery);
+    } else {
+      console.log('Error updating delivery:', data.error);
+    }
+  });
 
   const addDelivery = (delivery) => {
-    setDeliveries([...deliveries, delivery]);
+    DataService.addDelivery(delivery);
+    if (DataService.filterDelivery(delivery)) {
+      setDeliveries([...deliveries, delivery]);
+    }
   };
 
   const updateDelivery = (delivery) => {
     const newDeliveries = deliveries.map((d) => {
-      if (d.id === delivery.id) {
+      if (d._id === delivery._id) {
         return delivery;
       }
       return d;
@@ -59,7 +95,7 @@ const DeliveryProvider = ({children}) => {
   };
 
   const refreshDeliveries = () => {
-    setDeliveries(dataService.getDeliveries());
+    setDeliveries(DataService.getDeliveries());
   };
 
   return (
@@ -82,8 +118,18 @@ const DeliveryProvider = ({children}) => {
 const RestaurantContext = createContext();
 
 const RestaurantProvider = ({children}) => {
-  const [restaurants, setRestaurants] = useState(dataService.getRestaurants());
+  const [restaurants, setRestaurants] = useState(DataService.getRestaurants());
 
+  const { useSocketEvent } = useContext(SocketContext);
+
+  useSocketEvent('createRestaurant', (data) => {
+    if (data.created) {
+      addRestaurant(data.restaurant);
+    } else {
+      console.log('Error creating restaurant:', data.error);
+    }
+  });
+  
   const addRestaurant = (restaurant) => {
     setRestaurants([...restaurants, restaurant]);
   };

@@ -48,6 +48,7 @@ const FilteredListLayout = (props) => {
     </Center>
     <Box flex="5">
     <FlatList px="4" data={props.data}
+    keyExtractor={(item, index) => index.toString()}
     contentContainerStyle={{ paddingBottom: 50 }}
     renderItem={
       ({item}) => props.renderItem({data: item, navigation: props.navigation})
@@ -76,7 +77,6 @@ const CreateRestaurantForm = (props) => {
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [postcode, setPostcode] = useState('');
-  const { user } = useContext(UserContext);
   
   const handleSubmit = () => {
     const restaurant = new Restaurant(

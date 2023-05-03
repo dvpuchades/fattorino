@@ -22,15 +22,19 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Pressable, ScrollView } from "react-native";
 import QRCode from "react-native-qrcode-svg";
-import { FormLayout, FilteredListLayout, ProfileLayout, CreateRestaurantForm } from "../components/layouts.js";
+import { FormLayout, ProfileLayout, CreateRestaurantForm } from "../components/layouts.js";
 import { ScanQRCodeScreen } from "../screens/qr_screens.js";
 import { CreateBrandScreen } from "../screens/creation_screens.js";
 import { StaffCard, Tag, TripCard, Option } from "../components/widgets.js";
 import { ListItem } from "../components/widgets.js";
-import { RestaurantContext, RestaurantProvider } from "../components/context_providers.js";
+import { RestaurantContext, RestaurantProvider, UserContext } from "../components/context_providers.js";
 import { colors } from "../constants.js";
+import { SocketContext } from "../services/socket_provider.js";
+import DataService from "../services/data_service.js";
 
 const OptionList = ({navigation}) => {
+  const { setUser, setNeedsRestaurant } = useContext(UserContext);
+  const { disconnectFromRestaurant } = useContext(SocketContext);
   return (
     <Box width="100%" flex="1">
     <Center>
@@ -39,38 +43,39 @@ const OptionList = ({navigation}) => {
     <Box flex="5" margin="4" justifyContent="space-around">
     <Option icon="home-group" text="restaurants"
     onPress={() => navigation.navigate("RestaurantList")}/>
-    <Option icon="qrcode" text="show QR code"
-    onPress={() => 
-      navigation.navigate("ShowQRCodeScreen", {restaurant: {id: "1", name: "TODO"}})}/>
+    { DataService.user.restaurant ?
+        <Option icon="qrcode" text="show your restaurant"
+        onPress={() => 
+          navigation.navigate("RestaurantProfile", {restaurant: DataService.getUserRestaurant()})
+        }/> : null
+    }
     <Option icon="home-plus" text="add restaurant"
     onPress={() => navigation.navigate("CreateRestaurantScreen")}/>
     <Option icon="home-export-outline" text="disconnect from restaurant"
-    onPress={() => navigation.navigate("ScanQRCodeScreen")}/>
+    onPress={() => {
+      DataService.clean();
+      disconnectFromRestaurant();
+      setNeedsRestaurant(true);
+    }}/>
     <Option icon="bug" text="report a problem"
     onPress={() => navigation.navigate("ReportScreen")}/>
     <Option icon="pound" text="version info"
     onPress={() => navigation.navigate("VersionScreen")}/>
     <Option icon="logout" text="log out"
-    onPress={() => navigation.navigate("LogInScreen")}/>
+    onPress={() => {
+      setUser(null);
+      setNeedsRestaurant(true);
+    }}/>
     </Box>
     </Box>
-  );
-};
-
-const ShowQRCodeScreen = ({ route }) => {
-  const restaurant = route.params.restaurant;
-  return (
-    <FormLayout description={"QR Code for " + restaurant.name}>
-      <QRCode value={restaurant.id}/>
-    </FormLayout>
   );
 };
 
 // Another version of this Screen is used on login
 const CreateRestaurantScreen = ({navigation}) => {
-  const { addRestaurant } = useContext(RestaurantContext);
+  const { createRestaurant } = useContext(SocketContext);
   const submitRestaurant = (restaurant) => {
-    addRestaurant(restaurant);
+    createRestaurant(restaurant);
     navigation.navigate("RestaurantList");
   };
 
@@ -116,6 +121,17 @@ const RestaurantListItem = (props) => {
 
 const RestaurantProfile = ({ route }) => {
   const restaurant = route.params.restaurant;
+  const formatDate = (date) => {
+    // assumes date is a string
+    date = new Date(date);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
     <ProfileLayout title={restaurant.name}>
         <Center mb="5">
@@ -125,8 +141,8 @@ const RestaurantProfile = ({ route }) => {
           <Option text="connect to restaurant" icon="home-import-outline"/>
           <Tag icon="noodles" text={restaurant.numberOfDeliveries + " deliveries"}/>
           <Tag icon="account-group" text={restaurant.activeUsers + " active members"}/>
-          <Tag icon="calendar-plus" text={"posted on " + restaurant.uploadDate}/>
-          <Tag icon="home-plus" text={ "posted by " + restaurant.uploadUser}/>
+          <Tag icon="calendar-plus" text={"posted on " + formatDate(restaurant.creationDate)}/>
+          <Tag icon="home-plus" text={ "posted by " + restaurant.creatorName}/>
           <Tag icon="map-marker" text={restaurant.address}/>
           <Tag icon="city-variant" text={restaurant.city + ", " + restaurant.postcode}/>
           <Option text="remove restaurant" icon="home-minus"/>
@@ -160,7 +176,6 @@ const VersionScreen = () => {
 
 export {
   OptionList,
-  ShowQRCodeScreen,
   RestaurantList,
   RestaurantProfile,
   ReportScreen,

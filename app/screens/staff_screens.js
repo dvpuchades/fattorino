@@ -14,12 +14,12 @@ import { ListItem, Tag, TripCard, Option } from "../components/widgets.js";
 import { useContext, useState } from "react";
 import { StaffContext } from "../components/context_providers.js";
 import { StaffRestaurantFilter } from "../components/filters.js";
-import dataService from "../services/data_service.js";
+import DataService from "../services/data_service.js";
 
 const StaffList = ({navigation}) => {
   const restaurantDisclose = useDisclose();
   const { staff, refreshStaff, setFilters } = useContext(StaffContext);
-  const filters = dataService.getStaffFilters();
+  const filters = DataService.getStaffFilters();
   return (
     <Box flex={1}>
     <FilteredListLayout title="Staff"
@@ -33,42 +33,42 @@ const StaffList = ({navigation}) => {
       by restaurant
       </Button>
       <FilterToggle onCheck={ () => {
-        dataService.addStaffFilter("statusIdle.remove", (staff) => staff.status !== "idle");
+        DataService.addStaffFilter("statusIdle.remove", (staff) => staff.status !== "idle");
         refreshStaff();
-        setFilters(dataService.getStaffFilters());
+        setFilters(DataService.getStaffFilters());
       }}
       onUncheck={ () => {
-        dataService.removeStaffFilter("statusIdle.remove");
+        DataService.removeStaffFilter("statusIdle.remove");
         refreshStaff();
-        setFilters(dataService.getStaffFilters());
+        setFilters(DataService.getStaffFilters());
       }}
       default={filters.has("statusIdle")}
       >
       in place
       </FilterToggle>
       <FilterToggle onCheck={ () => {
-        dataService.addStaffFilter("statusDelivering.remove", (staff) => staff.status !== "delivering");
+        DataService.addStaffFilter("statusDelivering.remove", (staff) => staff.status !== "delivering");
         refreshStaff();
-        setFilters(dataService.getStaffFilters());
+        setFilters(DataService.getStaffFilters());
       }}
       onUncheck={ () => {
-        dataService.removeStaffFilter("statusDelivering.remove");
+        DataService.removeStaffFilter("statusDelivering.remove");
         refreshStaff();
-        setFilters(dataService.getStaffFilters());
+        setFilters(DataService.getStaffFilters());
       }}
       default={filters.has("statusDelivering")}
       >
       delivering
       </FilterToggle>
       <FilterToggle onCheck={ () => {
-        dataService.addStaffFilter("money.holders", (staff) => staff.balance > 0);
+        DataService.addStaffFilter("money.holders", (staff) => staff.balance > 0);
         refreshStaff();
-        setFilters(dataService.getStaffFilters());
+        setFilters(DataService.getStaffFilters());
       }}
       onUncheck={ () => {
-        dataService.removeStaffFilter("money.holders");
+        DataService.removeStaffFilter("money.holders");
         refreshStaff();
-        setFilters(dataService.getStaffFilters());
+        setFilters(DataService.getStaffFilters());
       }}
       default={filters.has("money")}
       >
@@ -101,7 +101,6 @@ const FilterToggle = (props) => {
 const StaffListItem = (props) => {
   return (
     <ListItem principalText={props.data.name}
-    key={props.data._id}
     secondaryText={props.data.restaurant}
     iconName={props.data.status == "delivering" ? "bike" : "account-clock-outline"}
     iconColor={colors.primaryColor}

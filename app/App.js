@@ -51,6 +51,7 @@ import {
   TripList
 } from "./screens/delivery_screens.js";
 import DashboardScreen from "./screens/dashboard_screens.js";
+import { SocketContext, SocketProvider } from "./services/socket_provider.js";
 import { UserContext, UserProvider } from "./components/context_providers.js";
 
 // Define the config
@@ -80,31 +81,38 @@ export default function App() {
   {
     return (
       <UserProvider>
+      <SocketProvider>
       <NativeBaseProvider theme={theme}>
         <RootNavigator/>
       </NativeBaseProvider>
+      </SocketProvider>
       </UserProvider>
     );
   }
 }
 
 const RootNavigator = () => {
-  const { user } = useContext(UserContext);
+  const { user, needsRestaurant } = useContext(UserContext);
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        { user ? null
-        : (
+        { user ?
+        <>
+        { needsRestaurant ?
           <>
-          <Stack.Screen name="LogInScreen" component={LogInScreen}/>
-          <Stack.Screen name="SignUpScreen" component={SignUpScreen}/>
           <Stack.Screen name="ScanQRCodeScreen" component={ScanQRCodeScreen}/>
           <Stack.Screen name="CreateBrandScreen" component={CreateBrandScreen}/>
           <Stack.Screen name="CreateRestaurantScreen" component={CreateFirstRestaurantScreen}/>
-          </>
-          )
+          </> :
+          <Stack.Screen name="DashboardScreen" component={DashboardScreen}/>
         }
-        <Stack.Screen name="DashboardScreen" component={DashboardScreen}/>
+        </>
+        :
+        <>
+        <Stack.Screen name="LogInScreen" component={LogInScreen}/>
+        <Stack.Screen name="SignUpScreen" component={SignUpScreen}/>
+        </>
+        }
       </Stack.Navigator>
     </NavigationContainer>
   );
