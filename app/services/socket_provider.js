@@ -96,7 +96,7 @@ const SocketProvider = ({ children }) => {
 
   const createFirstRestaurant = async (restaurant) => {
     await socket.emit('createFirstRestaurant', {restaurant});
-    await initializeClientPromise();
+    await initializeClient();
   }
 
   const createRestaurant = async (restaurant) => {
@@ -105,7 +105,7 @@ const SocketProvider = ({ children }) => {
 
   const connectToRestaurant = async (restaurant) => {
     await socket.emit('connectToRestaurant', {user: DataService.user, restaurant});
-    await initializeClientPromise();
+    await initializeClient();
   }
 
   const disconnectFromRestaurant = async () => {
