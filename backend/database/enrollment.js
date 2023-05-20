@@ -1,13 +1,12 @@
 const Enrollment = require('./models/enrollment');
 
 // Create a new enrollment
-async function createEnrollment({user, brand, restaurant, position, initTime}) {
+async function createEnrollment({user, brand, restaurant, position}) {
   const enrollment = new Enrollment({
     user,
     brand,
     restaurant,
-    position,
-    initTime
+    position
   });
   await enrollment.save();
   return enrollment;
@@ -34,7 +33,7 @@ async function findLastEnrollmentByUserAndBrand(userId, brandId) {
 async function findLastEnrollmentByUserAndRestaurant(userId, restaurantId) {
   const enrollment = await Enrollment.findOne({
     user: userId,
-    restaurant: restaurantId,
+    restaurant: restaurantId
   }).sort({initTime: -1});
   return enrollment;
 }
