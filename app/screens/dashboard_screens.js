@@ -56,8 +56,7 @@ import {
   TripList
 } from "../screens/delivery_screens.js";
 import { OptionList, CreateRestaurantScreen, RestaurantList, RestaurantProfile, ReportScreen, VersionScreen } from "../screens/options_screens.js";
-import { StaffProvider, DeliveryProvider, RestaurantProvider, UserContext } from "../components/context_providers.js";
-import DataService from '../services/data_service.js';
+import { DeliveryFilterProvider, StaffFilterProvider } from '../components/filter_providers.js';
 
 // Set stack navigator
 const Tab = createBottomTabNavigator();
@@ -108,52 +107,48 @@ const DashboardScreen = ({navigation}) => {
 
 const StaffScreen = () => {
   return (
-    <StaffProvider>
+    <StaffFilterProvider>
       <StaffStack.Navigator screenOptions={{ headerShown: false }}>
         <StaffStack.Screen name="StaffList" component={StaffList}/>
         <StaffStack.Screen name="StaffProfile" component={StaffProfile}/>
       </StaffStack.Navigator>
-    </StaffProvider>
+    </StaffFilterProvider>
   );
 };
 
 const DeliveriesScreen = () => {
   return (
-    <DeliveryProvider>
+    <DeliveryFilterProvider>
       <DeliveryStack.Navigator screenOptions={{ headerShown: false }}>
         <DeliveryStack.Screen name="DeliveryList" component={DeliveryList}/>
         <DeliveryStack.Screen name="DeliveryProfile" component={DeliveryProfile}/>
         <DeliveryStack.Screen name="PostDeliveryScreen" component={PostDeliveryScreen}/>
       </DeliveryStack.Navigator>
-    </DeliveryProvider>
+    </DeliveryFilterProvider>
   );
 };
 
 const TripScreen = () => {
   return (
-    <DeliveryProvider>
-      <TripStack.Navigator screenOptions={{ headerShown: false }}>
-        <TripStack.Screen name="TripList" component={TripList}/>
-      </TripStack.Navigator>
-    </DeliveryProvider>
+    <TripStack.Navigator screenOptions={{ headerShown: false }}>
+      <TripStack.Screen name="TripList" component={TripList}/>
+    </TripStack.Navigator>
   );
 };
 
 const OptionsScreen = () => {
   return (
-    <RestaurantProvider>
-      <OptionStack.Navigator screenOptions={{ headerShown: false }}>
-        <OptionStack.Screen name="OptionList" component={OptionList}/>
-        <OptionStack.Screen name="TripList" component={TripList}/>
-        <OptionStack.Screen name="RestaurantList" component={RestaurantList}/>
-        <OptionStack.Screen name="RestaurantProfile" component={RestaurantProfile}/>
-        <OptionStack.Screen name="CreateRestaurantScreen" component={CreateRestaurantScreen}/>
-        <OptionStack.Screen name="ScanQRCodeScreen" component={ScanQRCodeScreen}/>
-        <OptionStack.Screen name="ReportScreen" component={ReportScreen}/>
-        <OptionStack.Screen name="VersionScreen" component={VersionScreen}/>
-        <OptionStack.Screen name="LogInScreen" component={LogInScreen}/>
-      </OptionStack.Navigator>
-    </RestaurantProvider>
+    <OptionStack.Navigator screenOptions={{ headerShown: false }}>
+      <OptionStack.Screen name="OptionList" component={OptionList}/>
+      <OptionStack.Screen name="TripList" component={TripList}/>
+      <OptionStack.Screen name="RestaurantList" component={RestaurantList}/>
+      <OptionStack.Screen name="RestaurantProfile" component={RestaurantProfile}/>
+      <OptionStack.Screen name="CreateRestaurantScreen" component={CreateRestaurantScreen}/>
+      <OptionStack.Screen name="ScanQRCodeScreen" component={ScanQRCodeScreen}/>
+      <OptionStack.Screen name="ReportScreen" component={ReportScreen}/>
+      <OptionStack.Screen name="VersionScreen" component={VersionScreen}/>
+      <OptionStack.Screen name="LogInScreen" component={LogInScreen}/>
+    </OptionStack.Navigator>
   );
 };
 

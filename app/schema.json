@@ -1,0 +1,55 @@
+{
+  "user": {
+    "_id": 1,
+    "name": "John Doe",
+    "email": "email",
+    "restaurant": "id",
+    "brand": "id",
+    "position": "admin",
+    "currentTrip": "Trip"
+  },
+  "trip": {
+    "initTime": "time",
+    "deliveries": "list of deliveries"
+  },
+  "delivery": {
+    "customerName": "{ type: String, required: true }",
+    "customerPhone": "{ type: String, required: true }",
+    "address": "{ type: String, required: true }",
+    "city": "{ type: String, required: true }",
+    "postcode": "{ type: String, required: true }",
+    "amount": "{ type: Number, required: true }",
+    "status": "{ type: String, required: true }",
+    "initTime": "{ type: Date, default: Date.now }",
+    "readyTime": "{ type: Date }",
+    "departureTime": "{ type: Date }",
+    "endTime": "{ type: Date }",
+    "uploadUser": "{ type: Schema.Types.ObjectId, ref: 'User', required: true }",
+    "cooker": "{ type: Schema.Types.ObjectId, ref: 'User' }",
+    "courier": "{ type: Schema.Types.ObjectId, ref: 'User' }",
+    "restaurant": "{ type: Schema.Types.ObjectId, ref: 'Restaurant', required: true }",
+
+    "suggestedTrip": "id to trip"
+  },
+  "staff" : {
+    "_id": "id",
+    "name": "{ type: String, required: true }",
+    "position": "{ type: String, required: true }",
+    "restaurant": "{ type: Schema.Types.ObjectId, ref: 'Restaurant', required: true }",
+    "currentTrip": "{ type: Schema.Types.ObjectId, ref: 'Trip' }",
+    "phone": "{ type: String, required: true }",
+
+    "numberOfDeliveries": "deliveries done today",
+    "balance": " cash got today"
+  },
+  "restaurant" : {
+    "numberOfDeliveries":"deliveries done today",
+    "activeUsers": "list of active users",
+    "name": "{ type: String, required: true }",
+    "address": "{ type: String, required: true }",
+    "city": "{ type: String, required: true }",
+    "postcode": "{ type: String, required: true }",
+    "creatorName": "{ type: String, required: true }",
+    "creationName": "{ type: Date, default: Date.now }"
+  }
+}

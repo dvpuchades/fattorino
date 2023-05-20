@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {Button, Input} from "native-base";
 import { FormLayout, CreateRestaurantForm } from "../components/layouts.js";
-import { SocketContext } from "../services/socket_provider.js";
-import { Brand } from "../services/models.js";
+import { DataContext } from "../components/data_provider.js";
 
 const CreateBrandScreen = ({navigation}) => {
   const [brandName, setBrandName] = useState('');
-  const { createBrand } = useContext(SocketContext);
+  const { socket, user } = useContext(DataContext);
+  
   return (
     <FormLayout description="Enter your restaurants brand or the name of your chain restaurant.">
       <Input my="5" placeholder="brand name"
@@ -15,9 +15,14 @@ const CreateBrandScreen = ({navigation}) => {
       <Button my="5" colorScheme="primary"
       width="100%"
       onPress={() => {
-          createBrand(new Brand(brandName))
-            .then(() => navigation.navigate('CreateRestaurantScreen'))
-            .catch((error) => console.log(error));
+          const brand = {
+            name: brandName,
+            creator: user
+          };
+          socket.emit('post:brand', brand);
+          socket.once('post:brand', (brand) => {
+            navigation.navigate('CreateRestaurantScreen');
+          });
         }
       }
       >Register Brand</Button>
@@ -26,14 +31,11 @@ const CreateBrandScreen = ({navigation}) => {
 };
 
 const CreateFirstRestaurantScreen = ({navigation}) => {
-  const { createFirstRestaurant } = useContext(SocketContext);
-  const submitRestaurant = (restaurant) => {
-    createFirstRestaurant(restaurant)
-      .then(() => navigation.navigate("DashboardScreen"))
-      .catch((error) => console.log(error));
-  };
+  const { socket } = useContext(DataContext);
   return (
-    <CreateRestaurantForm onSubmit={(restaurant) => submitRestaurant(restaurant)}/>
+    <CreateRestaurantForm onSubmit={(restaurant) => {
+      socket.emit('post:restaurant', restaurant);
+    }}/>
   );
 };
 

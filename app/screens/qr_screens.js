@@ -3,41 +3,31 @@ import { StyleSheet } from 'react-native';
 import { View, Center, VStack, Button, Text, Spacer } from 'native-base';
 // https://docs.expo.io/versions/latest/sdk/bar-code-scanner/
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { SocketContext } from '../services/socket_provider';
-import { UserContext } from '../components/context_providers';
+import { DataContext } from '../components/data_provider.js';
 
 const ScanQRCodeScreen = ({navigation}) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
+  const { socket, user } = useContext(DataContext);
 
   useEffect(() => {
-    let isMounted = true;
     const getBarcodeScannerPermissions = async () => {
-      if (isMounted) {
         const { status } = await BarCodeScanner.requestPermissionsAsync();
         setHasPermission(status === 'granted');
-      }
     };
 
     getBarcodeScannerPermissions();
 
-    // set scanned to false when the screen gets mounted
-    setScanned(false);
-    return () => { isMounted = false };
+    // set scanned to false when the screen gets unmounted
+    // return () => setScanned(false);
   }, [scanned]);
-
-  const { connectToRestaurant } = useContext(SocketContext);
-  const { setNeedsRestaurant } = useContext(UserContext);
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
-    // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-    connectToRestaurant(data)
-      .then(() => {
-        console.log("Connected to restaurant");
-        // navigation.navigate("DashboardScreen");
-        setNeedsRestaurant(false);
-      });
+    socket.emit('post:staff', {
+      user,
+      restaurant: data
+    });
   };
 
   if (hasPermission === null) {

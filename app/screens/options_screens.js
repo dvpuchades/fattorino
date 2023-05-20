@@ -27,14 +27,11 @@ import { ScanQRCodeScreen } from "../screens/qr_screens.js";
 import { CreateBrandScreen } from "../screens/creation_screens.js";
 import { StaffCard, Tag, TripCard, Option } from "../components/widgets.js";
 import { ListItem } from "../components/widgets.js";
-import { RestaurantContext, RestaurantProvider, UserContext } from "../components/context_providers.js";
 import { colors } from "../constants.js";
-import { SocketContext } from "../services/socket_provider.js";
-import DataService from "../services/data_service.js";
+import { DataContext } from "../components/data_provider.js";
 
 const OptionList = ({navigation}) => {
-  const { setUser, setNeedsRestaurant } = useContext(UserContext);
-  const { disconnectFromRestaurant } = useContext(SocketContext);
+  const { socket, user, restaurants } = useContext(DataContext);
   return (
     <Box width="100%" flex="1">
     <Center>
@@ -43,29 +40,33 @@ const OptionList = ({navigation}) => {
     <Box flex="5" margin="4" justifyContent="space-around">
     <Option icon="home-group" text="restaurants"
     onPress={() => navigation.navigate("RestaurantList")}/>
-    { DataService.user.restaurant ?
+    { user.restaurant ?
         <Option icon="qrcode" text="show your restaurant"
         onPress={() => 
-          navigation.navigate("RestaurantProfile", {restaurant: DataService.getUserRestaurant()})
+          navigation.navigate("RestaurantProfile", {
+            restaurant: () => {
+              for (const restaurant of restaurants) {
+                if (restaurant._id === user.restaurant) {
+                  return restaurant;
+                }
+              }
+            }
+          })
         }/> : null
     }
     <Option icon="home-plus" text="add restaurant"
     onPress={() => navigation.navigate("CreateRestaurantScreen")}/>
     <Option icon="home-export-outline" text="disconnect from restaurant"
     onPress={() => {
-      DataService.clean();
-      disconnectFromRestaurant();
-      setNeedsRestaurant(true);
+      user.restaurant = undefined;
+      socket.emit('update:staff', user);
     }}/>
     <Option icon="bug" text="report a problem"
     onPress={() => navigation.navigate("ReportScreen")}/>
     <Option icon="pound" text="version info"
     onPress={() => navigation.navigate("VersionScreen")}/>
     <Option icon="logout" text="log out"
-    onPress={() => {
-      setUser(null);
-      setNeedsRestaurant(true);
-    }}/>
+    onPress={() => socket.emit('delete:staff', { _id: user._id })}/>
     </Box>
     </Box>
   );
@@ -73,9 +74,9 @@ const OptionList = ({navigation}) => {
 
 // Another version of this Screen is used on login
 const CreateRestaurantScreen = ({navigation}) => {
-  const { createRestaurant } = useContext(SocketContext);
+  const { socket } = useContext(DataContext);
   const submitRestaurant = (restaurant) => {
-    createRestaurant(restaurant);
+    socket.emit('post:restaurant', restaurant);
     navigation.navigate("RestaurantList");
   };
 
@@ -86,7 +87,7 @@ const CreateRestaurantScreen = ({navigation}) => {
 
 
 const RestaurantList = ({navigation}) => {
-  const { restaurants, setRestaurants } = useContext(RestaurantContext);
+  const { restaurants } = useContext(DataContext);
   return (
     <Box width="100%" flex="1">
     <Center>
@@ -113,8 +114,7 @@ const RestaurantListItem = (props) => {
     iconName="home"
     onPress={() => props.navigation.navigate("RestaurantProfile",
     {restaurant: props.item})}/>
-    <Box px="4">
-    </Box>
+    <Box px="4"/>
     </Box>
   );
 };

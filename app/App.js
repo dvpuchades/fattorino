@@ -1,36 +1,14 @@
-import React, {useState, useEffect, useContext} from "react";
+import React, {useState, useEffect, useContext, useRef} from "react";
 import {
   NativeBaseProvider,
-  extendTheme,
-  Text,
-  Button,
-  Square,
-  View,
-  VStack,
-  Center,
-  Spacer,
-  Input,
-  FlatList,
-  HStack,
-  Box,
-  Fab,
-  Icon,
-  FormControl
+  extendTheme
 } from "native-base";
 import AppLoading from 'expo-app-loading';
 import {
   useFonts,
   DMSerifDisplay_400Regular
 } from '@expo-google-fonts/dm-serif-display';
-import {
-  Manrope_200ExtraLight,
-  Manrope_300Light,
-  Manrope_400Regular,
-  Manrope_500Medium,
-  Manrope_600SemiBold,
-  Manrope_700Bold,
-  Manrope_800ExtraBold,
-} from '@expo-google-fonts/manrope';
+import { Manrope_400Regular } from '@expo-google-fonts/manrope';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
@@ -38,21 +16,10 @@ import {
   SignUpScreen
 } from './screens/welcome_screens.js';
 import { colors, styles } from './constants.js';
-import { FormLayout, FilteredListLayout, ProfileLayout, CreateRestaurantForm } from "./components/layouts.js";
 import { ScanQRCodeScreen } from "./screens/qr_screens.js";
 import { CreateBrandScreen, CreateFirstRestaurantScreen } from "./screens/creation_screens.js";
-import { StaffCard, Tag, TripCard, Option } from "./components/widgets.js";
-import { StaffList, StaffProfile } from "./screens/staff_screens.js";
-import { ListItem } from "./components/widgets.js";
-import {
-  DeliveryList,
-  DeliveryProfile,
-  PostDeliveryScreen,
-  TripList
-} from "./screens/delivery_screens.js";
 import DashboardScreen from "./screens/dashboard_screens.js";
-import { SocketContext, SocketProvider } from "./services/socket_provider.js";
-import { UserContext, UserProvider } from "./components/context_providers.js";
+import { DataContext, DataProvider } from "./components/data_provider.js";
 
 // Define the config
 const config = {
@@ -80,25 +47,24 @@ export default function App() {
   else
   {
     return (
-      <UserProvider>
-      <SocketProvider>
+      <DataProvider>
       <NativeBaseProvider theme={theme}>
         <RootNavigator/>
       </NativeBaseProvider>
-      </SocketProvider>
-      </UserProvider>
+      </DataProvider>
     );
   }
 }
 
 const RootNavigator = () => {
-  const { user, needsRestaurant } = useContext(UserContext);
+  const { user } = useContext(DataContext);
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         { user ?
         <>
-        { needsRestaurant ?
+        { (user.position !== "admin" && !user.restaurant) ?
           <>
           <Stack.Screen name="ScanQRCodeScreen" component={ScanQRCodeScreen}/>
           <Stack.Screen name="CreateBrandScreen" component={CreateBrandScreen}/>
