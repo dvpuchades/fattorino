@@ -6,7 +6,8 @@ const Delivery = mongoose.model('Delivery', deliverySchema);
 // Create a new delivery
 async function createDelivery(delivery) {
   const newDelivery = new Delivery(delivery);
-  return newDelivery.save();
+  const document = await newDelivery.save();
+  return document.toObject();
 }
 
 // Find delivery by id
@@ -26,7 +27,7 @@ async function findRecentOrActiveDeliveries(brand) {
       { status: { $ne: 'shipped' } }
     ],
     brand
-  }).exec();
+  }).lean();
 
   return deliveries;
 }
