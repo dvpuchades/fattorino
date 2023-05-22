@@ -4,6 +4,7 @@ import { View, Center, VStack, Button, Text, Spacer } from 'native-base';
 // https://docs.expo.io/versions/latest/sdk/bar-code-scanner/
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { DataContext } from '../components/data_provider.js';
+import { storeData } from '../utils/storage.js';
 
 const ScanQRCodeScreen = ({navigation}) => {
   const [hasPermission, setHasPermission] = useState(null);
@@ -23,11 +24,12 @@ const ScanQRCodeScreen = ({navigation}) => {
   }, [scanned]);
 
   const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
     socket.emit('post:staff', {
       user,
       restaurant: data
     });
+    storeData('restaurant', data);
+    setScanned(true);
   };
 
   if (hasPermission === null) {
