@@ -34,7 +34,8 @@
         "projectId": "47ef2c8f-1f74-400a-b225-f4883fcd6b48"
       }
     },
-    "owner": "dvpuchades"
+    "owner": "dvpuchades",
+    "sdkVersion": "48.0.0"
   },
   "name": "app"
 }
