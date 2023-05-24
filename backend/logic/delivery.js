@@ -57,7 +57,8 @@ class Delivery {
   }
 
   static async update(delivery) {
-    return await updateDelivery(delivery);
+    delivery = await updateDelivery(delivery);
+    return await getNamesByIds(delivery);
   }
 
   static async delete({_id}) {

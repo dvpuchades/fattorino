@@ -41,36 +41,19 @@ async function findTodaysDeliveriesForCourier(courier) {
   const deliveries = await Delivery.find({
     courier,
     initTime: { $gte: today, $lt: tomorrow }
-  }).exec();
+  }).lean();
 
   return deliveries;
 }
 
 // Update delivery properties if they are defined in the input object
 async function updateDelivery({ _id, status, endTime, cooker, courier, readyTime, departureTime }) {
-  const delivery = await Delivery.findById(_id);
-  if (!delivery) {
-    throw new Error('Delivery not found');
-  }
-  if (status !== undefined) {
-    delivery.status = status;
-  }
-  if (endTime !== undefined) {
-    delivery.endTime = endTime;
-  }
-  if (cooker !== undefined) {
-    delivery.cooker = cooker;
-  }
-  if (courier !== undefined) {
-    delivery.courier = courier;
-  }
-  if (readyTime !== undefined) {
-    delivery.readyTime = readyTime;
-  }
-  if (departureTime !== undefined) {
-    delivery.departureTime = departureTime;
-  }
-  await delivery.save();
+  const update = { status, endTime, cooker, courier, readyTime, departureTime };
+  const delivery = await Delivery.findOneAndUpdate(
+    { _id },
+    update,
+    { new: true }
+  ).lean();
   return delivery;
 }
 

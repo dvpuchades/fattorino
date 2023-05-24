@@ -140,7 +140,6 @@ io.on('connection', (socket) => {
 
   socket.on('post:restaurant', (restaurant) => {
     restaurant.brand = socket.brand;
-    restaurant.creatorId = socket.user;
     Restaurant.post(restaurant)
       .then((newRestaurant) => {
         if (Restaurant.isFirstRestaurant(socket.brand)) {
@@ -182,7 +181,7 @@ io.on('connection', (socket) => {
       .then((newStaff) => {
         socket.brand = newStaff.brand.toString();
         socket.join(newStaff.brand.toString());
-        io.sockets.in(socket.brand).emit('post:staff', newStaff);
+        emitInRoom('post:staff', newStaff);
         initialize();
       })
       .catch((error) => {
@@ -190,6 +189,17 @@ io.on('connection', (socket) => {
         socket.emit('post:staff', { error });
       }
     );
+  });
+
+  socket.on('update:staff', (staff) => {
+    Staff.update(staff)
+      .then((updatedStaff) => {
+        emitInRoom('update:staff', updatedStaff);
+      })
+      .catch((error) => {
+        console.log(error);
+        socket.emit('update:staff', { error });
+      });
   });
 
   socket.on('delete:staff', (staff) => {
