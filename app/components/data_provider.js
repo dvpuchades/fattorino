@@ -1,6 +1,7 @@
 import React, {useState, createContext, useEffect, useRef} from "react";
 import io from 'socket.io-client';
 import { server } from "../environment.js";
+import { storeData, getData } from "../utils/storage.js";
 
 const DataContext = createContext();
 
@@ -74,6 +75,7 @@ const DataProvider = ({children}) => {
     return true;
   };
 
+  // socket listeners
   useEffect(() => {
     socket.on('connect', () => {
       console.log('Connected to server:', socket.id);
@@ -81,6 +83,7 @@ const DataProvider = ({children}) => {
 
     socket.on('auth', ({user}) => {
       setUser(user);
+      storeData('user', user);
     });
 
     socket.on('init:delivery', (deliveries) => {
@@ -93,13 +96,11 @@ const DataProvider = ({children}) => {
     });
 
     socket.on('update:delivery', (delivery) => {
-      console.log('update:delivery', delivery);
       updateDelivery(delivery);
     });
 
     socket.on('init:staff', (worker) => {
-      setStaff(worker);
-      setFilteredStaff(worker);
+      initStaff(worker);
     });
 
     socket.on('post:staff', (worker) => {
@@ -138,6 +139,10 @@ const DataProvider = ({children}) => {
       updateRestaurant(restaurant);
     });
 
+    socket.on('post:brand', (brand) => {
+      postBrand(brand);
+    });
+
     return () => {
       socket.off('connect');
       socket.off('init:delivery');
@@ -153,6 +158,7 @@ const DataProvider = ({children}) => {
       socket.off('init:restaurant');
       socket.off('post:restaurant');
       socket.off('update:restaurant');
+      socket.off('post:brand');
     };
   }, [
     socket,
@@ -165,6 +171,23 @@ const DataProvider = ({children}) => {
     filteredStaff
   ]);
 
+  // try to get user from storage
+  useEffect(() => {
+    const userPromise = getData('user');
+    const restaurantPromise = getData('restaurant');
+    const brandPromise = getData('brand');
+    console.log('getting user from storage');
+    Promise.all([userPromise, restaurantPromise, brandPromise])
+      .then(([user, restaurant, brand]) => {
+        setUser(user)
+        if (user && (restaurant || brand)) {
+          console.log('getting user from storage', {user, restaurant, brand});
+          socket.emit('post:staff', {user, restaurant, brand});
+        }
+      }
+    );
+  }, []);
+
   const postDelivery = (delivery) => {
     if (checkFilters(deliveryFilters, delivery) && !includes(delivery, filteredDeliveries)) {
       setFilteredDeliveries([...filteredDeliveries, delivery]);
@@ -173,18 +196,31 @@ const DataProvider = ({children}) => {
   };
 
   const updateDelivery = (delivery) => {
-    setFilteredDeliveries(filteredDeliveries.map((d) => {
+    let updated = false;
+    const updatedFilteredDeliveries = filteredDeliveries.map((d) => {
       if (d._id === delivery._id) {
+        updated = true;
         return delivery;
       }
       return d;
-    }));
-    setDeliveries(deliveries.map((d) => {
-      if (d._id === delivery._id) {
-        return delivery;
-      }
-      return d;
-    }));
+    });
+    if (updated) {
+      setFilteredDeliveries([...updatedFilteredDeliveries]);
+    }
+    else {
+      const updatedDeliveries = deliveries.map((d) => {
+        if (d._id === delivery._id) {
+          return delivery;
+        }
+        return d;
+      });
+      setDeliveries([...updatedDeliveries]);
+    }
+  };
+
+  const initStaff = (s) => {
+    setStaff(s);
+    setFilteredStaff(s);
   };
 
   const postStaff = (s) => {
@@ -198,6 +234,7 @@ const DataProvider = ({children}) => {
   };
 
   const updateStaff = (updatedStaff) => {
+    if (updatedStaff._id === user._id) setUser(updatedStaff);
     const newStaff = staff.map((s) => {
       if (s._id === updatedStaff._id) {
         return updatedStaff;
@@ -254,6 +291,9 @@ const DataProvider = ({children}) => {
     setRestaurants(newRestaurants);
   };
 
+  const postBrand = ({_id}) => {
+    storeData('brand', _id);
+  };
 
   return (
     <DataContext.Provider value={{

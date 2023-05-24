@@ -112,8 +112,20 @@ const DeliveryListItem = (props) => {
 };
 
 const DeliveryProfile = ({route}) => {
-  const delivery = route.params.delivery;
-  const subscribedToContext = useContext(DataContext);
+  const deliveryToShow = route.params.delivery;
+  const [delivery, setDelivery] = useState(deliveryToShow);
+
+  // subscribe to changes in the data
+  const { filteredDeliveries } = useContext(DataContext);
+  useEffect(() => {
+    for (const d of filteredDeliveries) {
+      if (d._id === deliveryToShow._id) {
+        setDelivery(d);
+        break;
+      }
+    }
+  }, [filteredDeliveries]);
+
   return (
     <ProfileLayout title={delivery.address}
     subtitle={delivery.city + ", " + delivery.postcode}>
@@ -133,8 +145,8 @@ const DeliveryProfile = ({route}) => {
         <Tag icon="silverware-fork-knife" text={delivery.restaurant}/>
         <Tag icon="upload" text={"Uploaded by " + delivery.uploadUser}/>
         <Tag icon="clock" text={"Submitted at " + formatDate(delivery.initTime)}/>
-        { delivery.readyBy ?
-          <Tag icon="chef-hat" text={"Prepared by " + delivery.readyBy}/> : null }
+        { delivery.cooker ?
+          <Tag icon="chef-hat" text={"Prepared by " + delivery.cooker}/> : null }
         { delivery.readyTime ?
           <Tag icon="clock" text={"Prepared at " + formatDate(delivery.readyTime)}/> : null }
         { delivery.courier ?
@@ -155,23 +167,29 @@ const ButtonByStatus = ({delivery}) => {
   };
 
   const handleReady = () => {
-    delivery.status = "ready";
-    delivery.readyBy = user._id;
-    delivery.readyTime = new Date().toLocaleString();
-    updateDelivery(delivery);
+    updateDelivery({
+      _id: delivery._id,
+      status: 'ready',
+      cooker: user._id,
+      readyTime: new Date()
+    });
   };
 
   const handleDelivering = () => {
-    delivery.status = "delivering";
-    delivery.courier = user._id;
-    delivery.departureTime = new Date().toLocaleString();
-    updateDelivery(delivery);
+    updateDelivery({
+      _id: delivery._id,
+      status: 'delivering',
+      courier: user._id,
+      departureTime: new Date()
+    });
   };
 
   const handleShipped = () => {
-    delivery.status = "shipped";
-    delivery.endTime = new Date().toLocaleString();
-    updateDelivery(delivery);
+    updateDelivery({
+      _id: delivery._id,
+      status: 'shipped',
+      endTime: new Date()
+    });
   };
 
   switch (delivery.status) {
