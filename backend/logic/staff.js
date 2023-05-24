@@ -96,7 +96,8 @@ class Staff {
       const enrollment = await createEnrollment({
         user: user,
         position: isManager ? 'admin' : 'staff',
-        brand
+        brand,
+        restaurant: restaurant || null
       });
       return await composeUser(userObject, enrollment);
     }
