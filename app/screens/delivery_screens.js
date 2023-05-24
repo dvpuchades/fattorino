@@ -112,8 +112,20 @@ const DeliveryListItem = (props) => {
 };
 
 const DeliveryProfile = ({route}) => {
-  const delivery = route.params.delivery;
-  const subscribedToContext = useContext(DataContext);
+  const deliveryToShow = route.params.delivery;
+  const [delivery, setDelivery] = useState(deliveryToShow);
+
+  // subscribe to changes in the data
+  const { filteredDeliveries } = useContext(DataContext);
+  useEffect(() => {
+    for (const d of filteredDeliveries) {
+      if (d._id === deliveryToShow._id) {
+        setDelivery(d);
+        break;
+      }
+    }
+  }, [filteredDeliveries]);
+
   return (
     <ProfileLayout title={delivery.address}
     subtitle={delivery.city + ", " + delivery.postcode}>

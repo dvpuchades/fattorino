@@ -96,7 +96,6 @@ const DataProvider = ({children}) => {
     });
 
     socket.on('update:delivery', (delivery) => {
-      console.log('update:delivery', delivery);
       updateDelivery(delivery);
     });
 
@@ -197,18 +196,26 @@ const DataProvider = ({children}) => {
   };
 
   const updateDelivery = (delivery) => {
-    setFilteredDeliveries(filteredDeliveries.map((d) => {
+    let updated = false;
+    const updatedFilteredDeliveries = filteredDeliveries.map((d) => {
       if (d._id === delivery._id) {
+        updated = true;
         return delivery;
       }
       return d;
-    }));
-    setDeliveries(deliveries.map((d) => {
-      if (d._id === delivery._id) {
-        return delivery;
-      }
-      return d;
-    }));
+    });
+    if (updated) {
+      setFilteredDeliveries([...updatedFilteredDeliveries]);
+    }
+    else {
+      const updatedDeliveries = deliveries.map((d) => {
+        if (d._id === delivery._id) {
+          return delivery;
+        }
+        return d;
+      });
+      setDeliveries([...updatedDeliveries]);
+    }
   };
 
   const initStaff = (s) => {
@@ -227,6 +234,7 @@ const DataProvider = ({children}) => {
   };
 
   const updateStaff = (updatedStaff) => {
+    if (updatedStaff._id === user._id) setUser(updatedStaff);
     const newStaff = staff.map((s) => {
       if (s._id === updatedStaff._id) {
         return updatedStaff;

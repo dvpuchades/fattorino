@@ -1,5 +1,6 @@
 // Dashboard
 import { useContext } from "react";
+import { Pressable, ScrollView } from "react-native";
 import {
   NativeBaseProvider,
   extendTheme,
@@ -20,7 +21,6 @@ import {
 } from "native-base";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Pressable, ScrollView } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { FormLayout, ProfileLayout, CreateRestaurantForm } from "../components/layouts.js";
 import { ScanQRCodeScreen } from "../screens/qr_screens.js";
@@ -29,6 +29,7 @@ import { StaffCard, Tag, TripCard, Option } from "../components/widgets.js";
 import { ListItem } from "../components/widgets.js";
 import { colors } from "../constants.js";
 import { DataContext } from "../components/data_provider.js";
+import { removeData } from "../utils/storage.js";
 
 const OptionList = ({navigation}) => {
   const { socket, user, restaurants } = useContext(DataContext);
@@ -58,6 +59,7 @@ const OptionList = ({navigation}) => {
     onPress={() => navigation.navigate("CreateRestaurantScreen")}/>
     <Option icon="home-export-outline" text="disconnect from restaurant"
     onPress={() => {
+      removeData('restaurant');
       user.restaurant = undefined;
       socket.emit('update:staff', user);
     }}/>
@@ -66,7 +68,12 @@ const OptionList = ({navigation}) => {
     <Option icon="pound" text="version info"
     onPress={() => navigation.navigate("VersionScreen")}/>
     <Option icon="logout" text="log out"
-    onPress={() => socket.emit('delete:staff', { _id: user._id })}/>
+    onPress={() => {
+      removeData('user');
+      removeData('restaurant');
+      removeData('brand');
+      socket.emit('delete:staff', { _id: user._id })
+    }}/>
     </Box>
     </Box>
   );

@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import {
   Text,
   Center,
@@ -79,11 +79,15 @@ const CreateRestaurantForm = (props) => {
   const { user } = useContext(DataContext);
   
   const handleSubmit = () => {
+    let userId;
+    if (user instanceof Object) userId = user._id;
+    else userId = user;
     const restaurant = {
       name,
       address,
       city,
-      postcode
+      postcode,
+      creatorId: userId
     };
     props.onSubmit(restaurant);
   }
