@@ -6,7 +6,13 @@
   "scripts": {
     "start": "node sockets.js",
     "dev": "nodemon sockets.js",
-    "test": "jest --coverage --runInBand"
+    "test": "npx jest --coverage --runInBand"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/*.test.js"
+    ]
   },
   "author": "dvpuchades",
   "license": "ISC",

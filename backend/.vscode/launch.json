@@ -12,6 +12,17 @@
         "<node_internals>/**"
       ],
       "program": "${workspaceFolder}/sockets.js"
+    },
+    {
+      "name": "run logic tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": ["--inspect-brk", "${workspaceFolder}/node_modules/jest/bin/jest.js"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}",
+      "args": ["logic/tests"],
+      "outputCapture": "std"
     }
   ]
 }
