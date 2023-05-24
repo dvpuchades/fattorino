@@ -43,32 +43,19 @@ describe('testing post:staff logic', () => {
       name: 'brand',
       creator: creatorId
     };
-    const createdEnrollment = {
-      _id: enrollmentId,
-      user: userId,
-      restaurant: restaurantId,
-      position: 'staff',
-      brand: brandId,
-      initTime: new Date()
-    };
     
-    createEnrollment.mockResolvedValue(createdEnrollment);
     findRestaurantById.mockResolvedValue(restaurant);
     findTodaysDeliveriesForCourier.mockResolvedValue([]);
     findUserById.mockResolvedValue(user);
     findBrandById.mockResolvedValue(brand);
+    createEnrollment.mockImplementation((enrollment) => {
+      enrollment._id = enrollmentId;
+      return enrollment;
+    });
   });
 
   it('should enroll a user providing brand without a previous enrollment (new brand scenario)', async () => {
     // Mock specific functions to this test
-    const createdEnrollment = {
-      _id: enrollmentId,
-      user: userId,
-      position: 'staff',
-      brand: brandId,
-      initTime: new Date()
-    };
-    createEnrollment.mockResolvedValue(createdEnrollment);
     findLastEnrollmentByUserAndRestaurant.mockResolvedValue(null);
 
     // Call the function to test
@@ -129,6 +116,14 @@ describe('testing post:staff logic', () => {
 
   it('should enroll a user given a restaurant having a opened enrollment', async () => {
     // Mock specific functions to this test
+    const createdEnrollment = {
+      _id: enrollmentId,
+      user: userId,
+      restaurant: restaurantId,
+      position: 'staff',
+      brand: brandId,
+      initTime: new Date()
+    };
     const enrollment = {
       _id: enrollmentId,
       user: userId,
@@ -137,6 +132,8 @@ describe('testing post:staff logic', () => {
       position: 'staff',
       initTime: new Date()
     };
+
+    createEnrollment.mockResolvedValue(createdEnrollment);
     findLastEnrollmentByUserAndRestaurant.mockResolvedValue(enrollment);
 
     // Call the function to test
@@ -167,6 +164,14 @@ describe('testing post:staff logic', () => {
 
   it('should enroll a user given a restaurant having a previous closed enrollment (common scenario)', async () => {
     // Mock specific functions to this test
+    const createdEnrollment = {
+      _id: enrollmentId,
+      user: userId,
+      restaurant: restaurantId,
+      position: 'staff',
+      brand: brandId,
+      initTime: new Date()
+    };
     const enrollment = {
       _id: enrollmentId,
       user: userId,
@@ -176,6 +181,8 @@ describe('testing post:staff logic', () => {
       initTime: new Date(),
       endTime: new Date()
     };
+
+    createEnrollment.mockResolvedValue(createdEnrollment);
     findLastEnrollmentByUserAndRestaurant.mockResolvedValue(enrollment);
 
     // Call the function to test
