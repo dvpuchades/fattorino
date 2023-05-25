@@ -56,23 +56,31 @@ describe('testing post:staff logic', () => {
 
   it('should enroll a user providing brand without a previous enrollment (new brand scenario)', async () => {
     // Mock specific functions to this test
+    const user = {
+      _id: creatorId,
+      email: 'user@test.com',
+      name: 'user',
+      phone: '123456789',
+      status: 'idle'
+    };
+    findUserById.mockResolvedValue(user);
     findLastEnrollmentByUserAndRestaurant.mockResolvedValue(null);
 
     // Call the function to test
     const input = {
-      user: userId.toString(),
+      user: creatorId.toString(),
       brand: brandId.toString()
     };
     const result = await Staff.post(input);
 
     // Check the result
     const returnedUser = {
-      _id: userId,
+      _id: creatorId,
       email: 'user@test.com',
       name: 'user',
       phone: '123456789',
       status: 'idle',
-      position: 'staff',
+      position: 'admin',
       restaurant: undefined
     };
     expect(result._id).toBe(returnedUser._id);
