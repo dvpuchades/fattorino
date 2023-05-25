@@ -92,7 +92,7 @@ class Staff {
         brand = restaurantObject.brand;
       }
       const { creator } = await findBrandById(brand);
-      const isManager = creator == user;
+      const isManager = creator.equals(user);
       const enrollment = await createEnrollment({
         user: user,
         position: isManager ? 'admin' : 'staff',
