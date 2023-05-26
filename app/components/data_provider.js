@@ -75,6 +75,26 @@ const DataProvider = ({children}) => {
     return true;
   };
 
+  // back to auth functions
+  const cleanUpMemory = () => {
+    setDeliveries([]);
+    setStaff([]);
+    setTrips([]);
+    setRestaurants([]);
+    setFilteredDeliveries([]);
+    setFilteredStaff([]);
+  };
+
+  const userBackToAuth = () => {
+    setUser(user._id);
+    cleanUpMemory();
+  };
+
+  const logOut = () => {
+    setUser(null);
+    cleanUpMemory();
+  };
+
   // socket listeners
   useEffect(() => {
     socket.on('connect', () => {
@@ -247,8 +267,9 @@ const DataProvider = ({children}) => {
 
   const deleteStaff = (worker) => {
     const newStaff = staff.filter((item) => item._id !== worker);
+    const newFilteredStaff = filteredStaff.filter((item) => item._id !== worker);
     setStaff(newStaff);
-    if (user._id === worker) setUser(null);
+    setFilteredStaff(newFilteredStaff);
   };
 
   const postTrip = (trip) => {
@@ -299,6 +320,8 @@ const DataProvider = ({children}) => {
     <DataContext.Provider value={{
       socket,
       user,
+      userBackToAuth,
+      logOut,
       deliveries,
       staff,
       trips,

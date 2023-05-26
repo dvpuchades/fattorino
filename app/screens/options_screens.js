@@ -32,7 +32,14 @@ import { DataContext } from "../components/data_provider.js";
 import { removeData } from "../utils/storage.js";
 
 const OptionList = ({navigation}) => {
-  const { socket, user, restaurants } = useContext(DataContext);
+  const {
+    socket,
+    user,
+    userBackToAuth,
+    logOut,
+    restaurants
+  } = useContext(DataContext);
+
   return (
     <Box width="100%" flex="1">
     <Center>
@@ -60,8 +67,17 @@ const OptionList = ({navigation}) => {
     <Option icon="home-export-outline" text="disconnect from restaurant"
     onPress={() => {
       removeData('restaurant');
-      user.restaurant = undefined;
-      socket.emit('update:staff', user);
+      if (user.position === 'admin') {
+        user.restaurant = undefined;
+        socket.emit('update:staff', user);
+        // when user disconnects from restaurant
+        // come back to the auth status (user is an id)
+        userBackToAuth();
+      }
+      else {
+        socket.emit('delete:staff', { _id: user._id });
+        logOut();
+      }
     }}/>
     <Option icon="bug" text="report a problem"
     onPress={() => navigation.navigate("ReportScreen")}/>
