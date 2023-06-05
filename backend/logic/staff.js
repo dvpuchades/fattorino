@@ -22,6 +22,28 @@ const { findUserById } = require('../database/user');
 //   "balance": " cash got today"
 // }
 
+const composeUser = async (user, enrollment) => {
+  user.position = enrollment.position;
+  if (enrollment.restaurant) {
+    const restaurant = await findRestaurantById(enrollment.restaurant);
+    user.restaurant = restaurant.name;
+  }
+  user.brand = enrollment.brand;
+  const deliveries = await findTodaysDeliveriesForCourier(user._id);
+  user.numberOfDeliveries = deliveries.length;
+  user.balance = deliveries.reduce((acc, cur) => acc + cur.amount, 0);
+  const unshipped = deliveries.filter(delivery => delivery.status !== 'shipped');
+  if (unshipped.length > 0) {
+    user.currentTrip = {
+      initTime: new Date(Math.min(
+        ...unshipped.map((delivery) => delivery.departureTime)
+      )),
+      deliveries: unshipped
+    };
+  }
+  return user;
+};
+
 class Staff {
   static async init(brand) {
     const enrollments = await findEnrolledUsersByBrand(brand);
@@ -35,11 +57,13 @@ class Staff {
       user.numberOfDeliveries = deliveries.length;
       user.balance = deliveries.reduce((acc, cur) => acc + cur.amount, 0);
       const unshipped = deliveries.filter(delivery => delivery.status !== 'shipped');
-      user.currentTrip = {
-        initTime: new Date(Math.min(
-          ...unshipped.map((delivery) => delivery.departureTime)
-        )),
-        deliveries: unshipped
+      if (unshipped.length > 0) {
+        user.currentTrip = {
+          initTime: new Date(Math.min(
+            ...unshipped.map((delivery) => delivery.departureTime)
+          )),
+          deliveries: unshipped
+        };
       }
       staff.push(user);
     };
@@ -47,25 +71,6 @@ class Staff {
   }
 
   static async post({ user, restaurant, brand }) {
-    const composeUser = async (user, enrollment) => {
-      user.position = enrollment.position;
-      if (enrollment.restaurant) {
-        const restaurant = await findRestaurantById(enrollment.restaurant);
-        user.restaurant = restaurant.name;
-      }
-      user.brand = enrollment.brand;
-      const deliveries = await findTodaysDeliveriesForCourier(user._id);
-      user.numberOfDeliveries = deliveries.length;
-      user.balance = deliveries.reduce((acc, cur) => acc + cur.amount, 0);
-      const unshipped = deliveries.filter(delivery => delivery.status !== 'shipped');
-      user.currentTrip = {
-        initTime: new Date(Math.min(
-          ...unshipped.map((delivery) => delivery.departureTime)
-        )),
-        deliveries: unshipped
-      }
-      return user;
-    };
     const userObject = await findUserById(user);
     let enrollment;
     if (restaurant) {
