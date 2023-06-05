@@ -142,20 +142,27 @@ io.on('connection', (socket) => {
     restaurant.brand = socket.brand;
     Restaurant.post(restaurant)
       .then((newRestaurant) => {
-        if (Restaurant.isFirstRestaurant(socket.brand)) {
-          Staff.post({ user: socket.user, brand: socket.brand })
-            .then((newStaff) => {
-              socket.emit('post:staff', newStaff);
-              initialize();
-            })
-            .catch((error) => {
-              console.log(error);
-              socket.emit('post:restaurant', { error });
-            });
-        }
-        else {
-          emitInRoom('post:restaurant', newRestaurant);
-        }
+        Restaurant.isFirstRestaurant(socket.brand)
+          .then((isFirstRestaurant) => {
+            if (isFirstRestaurant) {
+              Staff.post({ user: socket.user, brand: socket.brand })
+                .then((newStaff) => {
+                  socket.emit('post:staff', newStaff);
+                  initialize();
+                })
+                .catch((error) => {
+                  console.log(error);
+                  socket.emit('post:restaurant', { error });
+                });
+            }
+            else {
+              // emit to all sockets in the room
+              // for some reason, triggering socket will catch the event
+              // so using emitInRoom would duplicate the restaurant
+              // in the creator client
+              io.sockets.in(socket.brand).emit('post:restaurant', newRestaurant);
+            }
+          })
       })
       .catch((error) => {
         console.log(error);
