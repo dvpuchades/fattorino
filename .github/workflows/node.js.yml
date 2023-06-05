@@ -35,6 +35,9 @@ jobs:
     - name: Install dependecies
       working-directory: ./backend
       run: npm ci
+    - name: Create environment file
+      working-directory: ./backend
+      run: npm run setup
     - name: Build
       working-directory: ./backend
       run: npm run build --if-present

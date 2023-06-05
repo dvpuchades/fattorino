@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node sockets.js",
     "dev": "nodemon sockets.js",
-    "test": "npx jest --coverage --runInBand"
+    "test": "npx jest --runInBand",
+    "setup": "node ../utils/setup_environment.js"
   },
   "jest": {
     "testEnvironment": "node",

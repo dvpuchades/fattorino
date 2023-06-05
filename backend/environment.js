@@ -1,5 +1,6 @@
+
 const database = {
-  uri: 'mongodb://127.0.0.1:27017/fattorino-development'
+  uri: 'mongodb://localhost:27017/fattorino-development'
 }
 
 module.exports = { database };
