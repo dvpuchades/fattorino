@@ -1,2 +1,5 @@
 node_modules/
 coverage/
+
+# ignoring environment.js (constains sensitive data)
+environment.js
