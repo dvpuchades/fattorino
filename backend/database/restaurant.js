@@ -2,7 +2,8 @@ const Restaurant = require('./models/restaurant.js');
 
 async function createRestaurant({brand, name, address, city, postcode, creatorId, creatorName, creationDate}) {
   const restaurant = new Restaurant({brand, name, address, city, postcode, creatorId, creatorName, creationDate});
-  return restaurant.save();
+  const document = await restaurant.save();
+  return document.toObject();
 }
 
 async function findRestaurantById(id) {
@@ -11,7 +12,7 @@ async function findRestaurantById(id) {
 }
 
 async function findRestaurantsByBrandId(brandId) {
-  const restaurants = await Restaurant.find({ brand: brandId });
+  const restaurants = await Restaurant.find({ brand: brandId }).lean();
   return restaurants;
 }
 

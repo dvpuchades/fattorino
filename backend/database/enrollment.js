@@ -47,6 +47,15 @@ async function findEnrolledUsersByBrand(brandId) {
   return enrollments;
 }
 
+// Find enrolled users by restaurant
+async function findEnrolledUsersByRestaurant(restaurantId) {
+  const enrollments = await Enrollment.find({
+    restaurant: restaurantId,
+    endTime: { $exists: false }
+  }).sort({initTime: -1});
+  return enrollments;
+}
+
 // Update an enrollment
 async function updateLastEnrollment(user, brand, update) {
   const enrollment = await findLastEnrollmentByUserAndBrand(user, brand);
@@ -76,6 +85,7 @@ module.exports = {
   findLastEnrollmentByUserAndBrand,
   findLastEnrollmentByUserAndRestaurant,
   findEnrolledUsersByBrand,
+  findEnrolledUsersByRestaurant,
   updateLastEnrollment,
   closeLastEnrollment
 };
