@@ -61,9 +61,13 @@ const ScanQRCodeScreen = ({navigation}) => {
         onPress={() => navigation.navigate('CreateBrandScreen')}
       > Do you manage a restaurant? Get started!
       </Button>
+      {scanned &&
+        <Button flex="1" onPress={() => setScanned(false)} width="100%">
+          Tap to Scan Again
+        </Button>
+      }
       <Spacer flex="2"/>
       </VStack>
-      {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
     </Center>
   );
 }
