@@ -43,7 +43,7 @@ describe('Restaurant service', () => {
       expect(createdRestaurant.postcode).toEqual('12345');
       expect(createdRestaurant.creatorId).toEqual(testUserId);
       expect(createdRestaurant.creatorName).toEqual('Test User');
-      expect(createdRestaurant.created).toBeInstanceOf(Date);
+      expect(createdRestaurant.creationDate).toBeInstanceOf(Date);
     });
   });
 

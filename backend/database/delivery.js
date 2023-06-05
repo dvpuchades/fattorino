@@ -69,6 +69,7 @@ async function updateDelivery({ _id, status, endTime, cooker, courier, readyTime
     update,
     { new: true }
   ).lean();
+  if (!delivery) throw new Error('Delivery not found');
   return delivery;
 }
 

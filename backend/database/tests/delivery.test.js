@@ -14,7 +14,8 @@ const testDelivery = {
   status: 'pending',
   initTime: new Date(),
   uploadUser: new mongoose.Types.ObjectId(),
-  restaurant: new mongoose.Types.ObjectId()
+  restaurant: new mongoose.Types.ObjectId(),
+  brand: new mongoose.Types.ObjectId()
 };
 
 let db;
@@ -60,7 +61,7 @@ describe('updateDelivery', () => {
 
   it('should update a delivery in every field where possible', async () => {
     const updatedDelivery = {
-      id: deliveryId,
+      _id: deliveryId,
       status: 'shipped',
       departureTime: new Date(),
       courier: new mongoose.Types.ObjectId(),
@@ -68,8 +69,7 @@ describe('updateDelivery', () => {
       endTime: new Date(),
       cooker: new mongoose.Types.ObjectId()
     };
-    await updateDelivery(updatedDelivery);
-    const result = await findDeliveryById(deliveryId);
+    const result = await updateDelivery(updatedDelivery);
     expect(result.status).toBe(updatedDelivery.status);
     expect(result.departureTime).toEqual(updatedDelivery.departureTime);
     expect(result.courier).toEqual(updatedDelivery.courier);
@@ -80,7 +80,7 @@ describe('updateDelivery', () => {
 
   it('should update some fields of a delivery and remain others the same', async () => {
     const updatedDelivery = {
-      id: deliveryId,
+      _id: deliveryId,
       status: 'shipped',
       departureTime: new Date()
     };
@@ -94,7 +94,7 @@ describe('updateDelivery', () => {
   it('should throw an error for non-existent delivery', async () => {
     const fakeId = new mongoose.Types.ObjectId();
     const fakeDelivery = {
-      id: fakeId,
+      _id: fakeId,
       status: 'shipped',
       departureTime: new Date()
     };
