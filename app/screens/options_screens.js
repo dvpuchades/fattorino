@@ -76,7 +76,7 @@ const OptionList = ({navigation}) => {
       }
       else {
         socket.emit('delete:staff', { _id: user._id });
-        logOut();
+        userBackToAuth();
       }
     }}/>
     <Option icon="bug" text="report a problem"
@@ -88,7 +88,8 @@ const OptionList = ({navigation}) => {
       removeData('user');
       removeData('restaurant');
       removeData('brand');
-      socket.emit('delete:staff', { _id: user._id })
+      socket.emit('delete:staff', { _id: user._id });
+      logOut();
     }}/>
     </Box>
     </Box>
