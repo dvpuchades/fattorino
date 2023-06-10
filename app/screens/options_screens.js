@@ -1,25 +1,13 @@
 // Dashboard
 import { useContext } from "react";
-import { Pressable, ScrollView } from "react-native";
+import { ScrollView } from "react-native";
 import {
-  NativeBaseProvider,
-  extendTheme,
   Text,
   Button,
-  Square,
-  View,
-  VStack,
   Center,
-  Spacer,
   Input,
-  FlatList,
-  HStack,
-  Box,
-  Fab,
-  Icon,
-  FormControl
+  Box
 } from "native-base";
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import QRCode from "react-native-qrcode-svg";
 import { FormLayout, ProfileLayout, CreateRestaurantForm } from "../components/layouts.js";
 import { Tag, Option } from "../components/widgets.js";

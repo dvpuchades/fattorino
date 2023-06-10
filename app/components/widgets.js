@@ -5,9 +5,9 @@ import {
   Box,
   Center
 } from "native-base";
-import { colors } from '../constants.js';
 import { Pressable } from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { formatDate } from '../utils/date.js';
 
 const ListItem = (props) => {
   return (
@@ -52,15 +52,15 @@ const Tag = (props) => {
   );
 };
 
-const TripCard = (props) => {
+const TripCard = ({title, trip, markToDeliver = true}) => {
   return (
     <Box rounded="md" bgColor="gray.200" mx="4" padding="4">
       <Center>
         <Text fontSize="xl">
-          { props.title }
+          { title }
         </Text>
       </Center>
-      { props.trip.deliveries.map((delivery, index) => {
+      { trip.deliveries.map((delivery, index) => {
         return (
           <HStack my="2" key={index}>
             <VStack flex="5">
@@ -69,7 +69,7 @@ const TripCard = (props) => {
                 fontWeight: "bold"
               }}
               >{delivery.address}</Text>
-              <Text fontSize="xl">{delivery.initTime}</Text>
+              <Text fontSize="xl">{formatDate(delivery.initTime)}</Text>
             </VStack>
             <Box flex="1" alignItems="center" justifyContent="center">  
               <IconByStatus status={delivery.status}/>
@@ -77,9 +77,11 @@ const TripCard = (props) => {
           </HStack>
         )})
       }
-      <Center>
-      <Option text="mark to deliver & open" icon="transit-detour"/>
-      </Center>
+      { markToDeliver?
+        <Center>
+        <Option text="mark to deliver & open" icon="transit-detour"/>
+        </Center> : null
+      }
       </Box>
   );
 };

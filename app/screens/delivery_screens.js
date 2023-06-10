@@ -28,20 +28,7 @@ import { useIsFocused } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { hasFilter, DeliveryCityFilter, DeliveryStatusFilter, DeliveryPostcodeFilter, DeliveryCourierFilter, DeliveryRestaurantFilter } from "../components/filters.js";
 import { DataContext } from "../components/data_provider.js";
-
-const formatDate = (date) => {
-  // asuming date is a string in the format "2023-05-20T12:00:00.000Z"
-  date = new Date(date);
-  const hoursAndMinutes = date.getHours() + ':' + date.getMinutes();
-  const day = date.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-  return hoursAndMinutes + ' on ' + day;
-};
-
+import { formatDate } from "../utils/date.js";
 
 const DeliveryList = ({navigation}) => {
   const statusDisclose = useDisclose();

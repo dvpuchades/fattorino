@@ -14,6 +14,7 @@ import { useContext, useState } from "react";
 import { hasFilter, StaffRestaurantFilter } from "../components/filters.js";
 import { StaffFilterContext } from "../components/filter_providers.js";
 import { DataContext } from "../components/data_provider.js";
+import { formatDate } from "../utils/date.js";
 
 const StaffList = ({navigation}) => {
   const restaurantDisclose = useDisclose();
@@ -103,8 +104,11 @@ const StaffProfile = ({route}) => {
     subtitle={staff.restaurant}>
       {
         staff.currentTrip ?
-        ( <TripCard title={"Current trip, started at " + staff.currentTrip.initTime}
-        trip={staff.currentTrip}/> ) : null
+        ( <TripCard title={
+            "Current trip, started at " + formatDate(staff.currentTrip.initTime)
+          }
+        trip={staff.currentTrip}
+        markToDeliver={false}/> ) : null
       }
       <Box margin="4">
         <Tag icon="comment-account" text={staff.status}
