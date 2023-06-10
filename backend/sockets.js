@@ -44,15 +44,13 @@ io.on('connection', (socket) => {
       });
   };
 
-  // socket contains user info as below:
-  // socket.user = _id
+  // socket contains brand info as below:
   // socket.brand = brand
 
   socket.on('register', (user) => {
     Auth.register(user)
       .then((user) => {
         socket.emit('auth', { user: user._id });
-        socket.user = user._id;
       })
       .catch((error) => {
         console.log(error);
@@ -64,7 +62,6 @@ io.on('connection', (socket) => {
     Auth.auth(email, password)
       .then((user) => {
         socket.emit('auth', { user: user._id });
-        socket.user = user._id;
       })
       .catch((error) => {
         console.log(error);
@@ -145,7 +142,7 @@ io.on('connection', (socket) => {
         Restaurant.isFirstRestaurant(socket.brand)
           .then((isFirstRestaurant) => {
             if (isFirstRestaurant) {
-              Staff.post({ user: socket.user, brand: socket.brand })
+              Staff.post({ user: restaurant.creatorId, brand: socket.brand })
                 .then((newStaff) => {
                   socket.emit('post:staff', newStaff);
                   initialize();

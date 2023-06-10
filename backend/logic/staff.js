@@ -114,7 +114,7 @@ class Staff {
     const enrollment = await createEnrollment({
       user: _id,
       brand: previousEnrollment.brand,
-      position: 'staff'
+      position: previousEnrollment.position
     });
     const user = await findUserById(_id);
     return await composeUser(user, enrollment);

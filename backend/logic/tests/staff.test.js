@@ -144,6 +144,9 @@ describe('testing post:staff logic', () => {
     createEnrollment.mockResolvedValue(createdEnrollment);
     findLastEnrollmentByUserAndRestaurant.mockResolvedValue(enrollment);
 
+    // get current number of calls to createEnrollment
+    const createEnrollmentNumberOfCalls = createEnrollment.mock.calls.length;
+
     // Call the function to test
     const input = {
       user: userId.toString(),
@@ -168,6 +171,9 @@ describe('testing post:staff logic', () => {
     expect(result.status).toBe(returnedUser.status);
     expect(result.position).toBe(returnedUser.position);
     expect(result.restaurant).toBe(returnedUser.restaurant);
+
+    // as an opened enrollment was found, the createEnrollment function should not be called
+    expect(createEnrollment.mock.calls).toHaveLength(createEnrollmentNumberOfCalls);
   });
 
   it('should enroll a user given a restaurant having a previous closed enrollment (common scenario)', async () => {
