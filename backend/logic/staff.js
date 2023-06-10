@@ -18,6 +18,8 @@ const { findUserById } = require('../database/user');
 //   "currentTrip": "{ type: Schema.Types.ObjectId, ref: 'Trip' }",
 //   "phone": "{ type: String, required: true }",
 
+//   "brand": "{ type: Schema.Types.ObjectId, ref: 'Brand', required: true }",
+//   "status": "idle" || "delivering",
 //   "numberOfDeliveries": "deliveries done today",
 //   "balance": " cash got today"
 // }
@@ -40,6 +42,11 @@ const composeUser = async (user, enrollment) => {
       )),
       deliveries: unshipped
     };
+
+    user.status = 'delivering';
+  }
+  else {
+    user.status = 'idle';
   }
   return user;
 };
@@ -50,22 +57,7 @@ class Staff {
     const staff = [];
     for (const enrollment of enrollments) {
       const user = await findUserById(enrollment.user);
-      user.position = enrollment.position;
-      const restaurant = await findRestaurantById(enrollment.restaurant);
-      if (restaurant) user.restaurant = restaurant.name;
-      const deliveries = await findTodaysDeliveriesForCourier(user._id);
-      user.numberOfDeliveries = deliveries.length;
-      user.balance = deliveries.reduce((acc, cur) => acc + cur.amount, 0);
-      const unshipped = deliveries.filter(delivery => delivery.status !== 'shipped');
-      if (unshipped.length > 0) {
-        user.currentTrip = {
-          initTime: new Date(Math.min(
-            ...unshipped.map((delivery) => delivery.departureTime)
-          )),
-          deliveries: unshipped
-        };
-      }
-      staff.push(user);
+      staff.push(await composeUser(user, enrollment));
     };
     return staff;
   }
