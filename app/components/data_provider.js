@@ -245,6 +245,7 @@ const DataProvider = ({children}) => {
 
   const postStaff = (s) => {
     if (s._id === user) {
+      // user becomes an object
       setUser(s);
     }
     setStaff([...staff, s]);

@@ -20,12 +20,9 @@ import {
   FormControl
 } from "native-base";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import QRCode from "react-native-qrcode-svg";
 import { FormLayout, ProfileLayout, CreateRestaurantForm } from "../components/layouts.js";
-import { ScanQRCodeScreen } from "../screens/qr_screens.js";
-import { CreateBrandScreen } from "../screens/creation_screens.js";
-import { StaffCard, Tag, TripCard, Option } from "../components/widgets.js";
+import { Tag, Option } from "../components/widgets.js";
 import { ListItem } from "../components/widgets.js";
 import { colors } from "../constants.js";
 import { DataContext } from "../components/data_provider.js";
@@ -64,21 +61,20 @@ const OptionList = ({navigation}) => {
     }
     <Option icon="home-plus" text="add restaurant"
     onPress={() => navigation.navigate("CreateRestaurantScreen")}/>
-    <Option icon="home-export-outline" text="disconnect from restaurant"
-    onPress={() => {
-      removeData('restaurant');
-      if (user.position === 'admin') {
-        user.restaurant = undefined;
-        socket.emit('update:staff', user);
-        // when user disconnects from restaurant
-        // come back to the auth status (user is an id)
-        userBackToAuth();
-      }
-      else {
-        socket.emit('delete:staff', { _id: user._id });
-        userBackToAuth();
-      }
-    }}/>
+    { user.restaurant ?
+      <Option icon="home-export-outline" text="disconnect from restaurant"
+      onPress={() => {
+        removeData('restaurant');
+        if (user.position === 'admin') {
+          user.restaurant = undefined;
+          socket.emit('update:staff', user);
+        }
+        else {
+          socket.emit('delete:staff', { _id: user._id });
+          userBackToAuth();
+        }
+      }}/> : null
+    }
     <Option icon="bug" text="report a problem"
     onPress={() => navigation.navigate("ReportScreen")}/>
     <Option icon="pound" text="version info"
