@@ -64,7 +64,7 @@ const RootNavigator = () => {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         { user ?
         <>
-        { (user.position !== "admin" && !user.restaurant) ?
+        { (user.position !== "manager" && !user.restaurant) ?
           <>
           <Stack.Screen name="ScanQRCodeScreen" component={ScanQRCodeScreen}/>
           <Stack.Screen name="CreateBrandScreen" component={CreateBrandScreen}/>

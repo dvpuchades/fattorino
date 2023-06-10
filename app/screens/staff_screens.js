@@ -113,6 +113,8 @@ const StaffProfile = ({route}) => {
       <Box margin="4">
         <Tag icon="comment-account" text={staff.status}
         color={colors.primaryColor}/>
+        <Tag icon="face-man" 
+        text={staff.position}/>
         <Tag icon="truck-delivery" 
         text={staff.numberOfDeliveries + " deliveries delivered today"}/>
         <Tag icon="cash" text={staff.balance + " € in balance"}/>

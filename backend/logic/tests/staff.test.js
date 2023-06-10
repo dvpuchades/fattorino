@@ -80,7 +80,7 @@ describe('testing post:staff logic', () => {
       name: 'user',
       phone: '123456789',
       status: 'idle',
-      position: 'admin',
+      position: 'manager',
       restaurant: undefined
     };
     expect(result._id).toBe(returnedUser._id);

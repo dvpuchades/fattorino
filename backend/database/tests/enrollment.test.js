@@ -29,14 +29,14 @@ describe('Enrollment controller', () => {
         user: userId,
         brand: brandId,
         restaurant: restaurantId,
-        position: 'admin',
+        position: 'manager',
         initTime: new Date()
       });
       expect(enrollment).toMatchObject({
         user: userId,
         brand: brandId,
         restaurant: restaurantId,
-        position: 'admin'
+        position: 'manager'
       });
       testEnrollmentId = enrollment._id;
     });
@@ -48,7 +48,7 @@ describe('Enrollment controller', () => {
       expect(enrollment).toMatchObject({
         user: userId,
         brand: brandId,
-        position: 'admin'
+        position: 'manager'
       });
     });
   });
@@ -59,7 +59,7 @@ describe('Enrollment controller', () => {
       expect(enrollment).toMatchObject({
         user: userId,
         restaurant: restaurantId,
-        position: 'admin'
+        position: 'manager'
       });
     });
   });

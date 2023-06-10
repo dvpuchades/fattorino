@@ -53,7 +53,7 @@ const OptionList = ({navigation}) => {
       <Option icon="home-export-outline" text="disconnect from restaurant"
       onPress={() => {
         removeData('restaurant');
-        if (user.position === 'admin') {
+        if (user.position === 'manager') {
           user.restaurant = undefined;
           socket.emit('update:staff', user);
         }

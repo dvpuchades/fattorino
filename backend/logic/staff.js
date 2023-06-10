@@ -100,7 +100,7 @@ class Staff {
       const isManager = creator.equals(user);
       const enrollment = await createEnrollment({
         user: user,
-        position: isManager ? 'admin' : 'staff',
+        position: isManager ? 'manager' : 'staff',
         brand,
         restaurant: restaurant || null
       });
