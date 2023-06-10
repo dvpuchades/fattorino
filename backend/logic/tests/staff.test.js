@@ -15,7 +15,6 @@ jest.mock('../../database/brand.js');
 
 const mongoose = require('mongoose');
 const Staff = require('../staff.js');
-const { InvalidArgumentError } = require('../../errors.js');
 
 const restaurantId = new mongoose.Types.ObjectId();
 const brandId = new mongoose.Types.ObjectId();
@@ -123,7 +122,7 @@ describe('testing post:staff logic', () => {
     expect(result.restaurant).toBe(returnedUser.restaurant);
   });
 
-  it('should throw an error when enrolling a user given a restaurant having a opened enrollment', async () => {
+  it('should enroll a user given a restaurant having a opened enrollment', async () => {
     // Mock specific functions to this test
     const createdEnrollment = {
       _id: enrollmentId,
@@ -145,24 +144,30 @@ describe('testing post:staff logic', () => {
     createEnrollment.mockResolvedValue(createdEnrollment);
     findLastEnrollmentByUserAndRestaurant.mockResolvedValue(enrollment);
 
-    // get current number of calls to createEnrollment
-    const createEnrollmentNumberOfCalls = createEnrollment.mock.calls.length;
-
     // Call the function to test
     const input = {
       user: userId.toString(),
       restaurant: restaurantId.toString()
     };
+    const result = await Staff.post(input);
 
-    try {
-      await Staff.post(input);
-    }
-    catch (error) {
-      expect(error).toBeInstanceOf(InvalidArgumentError);
-    }
-    
-    // as an opened enrollment was found, the createEnrollment function should not be called
-    expect(createEnrollment.mock.calls).toHaveLength(createEnrollmentNumberOfCalls);
+    // Check the result
+    const returnedUser = {
+      _id: userId,
+      email: 'user@test.com',
+      name: 'user',
+      phone: '123456789',
+      status: 'idle',
+      position: 'staff',
+      restaurant: 'restaurant'
+    };
+    expect(result._id).toBe(returnedUser._id);
+    expect(result.email).toBe(returnedUser.email);
+    expect(result.name).toBe(returnedUser.name);
+    expect(result.phone).toBe(returnedUser.phone);
+    expect(result.status).toBe(returnedUser.status);
+    expect(result.position).toBe(returnedUser.position);
+    expect(result.restaurant).toBe(returnedUser.restaurant);
   });
 
   it('should enroll a user given a restaurant having a previous closed enrollment (common scenario)', async () => {
