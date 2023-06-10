@@ -1,5 +1,5 @@
-const { findBrandById } = require('../database/brand.js');
-const { findTodaysDeliveriesForCourier } = require('../database/delivery.js');
+const { findBrandById } = require('../database/brand');
+const { findTodaysDeliveriesForCourier } = require('../database/delivery');
 const { 
   createEnrollment,
   findEnrolledUsersByBrand,
@@ -7,9 +7,8 @@ const {
   findLastEnrollmentByUser,
   closeLastEnrollment
 } = require('../database/enrollment.js');
-const { findRestaurantById } = require('../database/restaurant.js');
-const { findUserById } = require('../database/user.js');
-const { InvalidArgumentError } = require('../errors.js');
+const { findRestaurantById } = require('../database/restaurant');
+const { findUserById } = require('../database/user');
 
 // "staff" : {
 //   "_id": "id",
@@ -89,7 +88,7 @@ class Staff {
         return await composeUser(userObject, enrollment);
       }
       else {
-        throw new InvalidArgumentError('User is already enrolled in this restaurant');
+        return await composeUser(userObject, enrollment);
       }
     }
     else {
@@ -115,7 +114,7 @@ class Staff {
     const enrollment = await createEnrollment({
       user: _id,
       brand: previousEnrollment.brand,
-      position: 'staff'
+      position: previousEnrollment.position
     });
     const user = await findUserById(_id);
     return await composeUser(user, enrollment);
