@@ -1,11 +1,12 @@
 const { findBrandById } = require('../database/brand');
-const { findTodaysDeliveriesForCourier } = require('../database/delivery');
+const { findTodaysDeliveriesForCourier, findDeliveryById } = require('../database/delivery');
 const { 
   createEnrollment,
   findEnrolledUsersByBrand,
   findLastEnrollmentByUserAndRestaurant,
   findLastEnrollmentByUser,
-  closeLastEnrollment
+  closeLastEnrollment,
+  findLastEnrollmentByUserAndBrand
 } = require('../database/enrollment.js');
 const { findRestaurantById } = require('../database/restaurant');
 const { findUserById } = require('../database/user');
@@ -98,6 +99,13 @@ class Staff {
       });
       return await composeUser(userObject, enrollment);
     }
+  }
+
+  static async get({ courierForDelivery }) {
+    const { courier, brand } = await findDeliveryById(courierForDelivery);
+    const user = await findUserById(courier);
+    const enrollment = await findLastEnrollmentByUserAndBrand(courier, brand);
+    return await composeUser(user, enrollment);
   }
 
   // update only for a disconnect from a restaurant at the moment

@@ -103,6 +103,14 @@ io.on('connection', (socket) => {
     Delivery.update(delivery)
       .then((updatedDelivery) => {
         emitInRoom('update:delivery', updatedDelivery);
+        // There is a relationship between delivery and staff
+        // if the status is updated, the staff should be updated as well
+        if (delivery.status === 'delivering' || delivery.status === 'shipped') {
+          Staff.get({ courierForDelivery: delivery._id })
+            .then((courier) => {
+              emitInRoom('update:staff', courier);
+            });
+        }
       })
       .catch((error) => {
         console.log(error);
