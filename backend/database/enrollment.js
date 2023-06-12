@@ -12,6 +12,15 @@ async function createEnrollment({user, brand, restaurant, position}) {
   return enrollment;
 }
 
+// find opened enrollments by user
+async function findOpenedEnrollmentsByUser(userId) {
+  const enrollments = await Enrollment.find({
+    user: userId,
+    endTime: { $exists: false }
+  }).sort({initTime: -1});
+  return enrollments;
+}
+
 // Find an enrollment by user
 async function findLastEnrollmentByUser(userId) {
   const enrollment = await Enrollment.findOne({
@@ -79,13 +88,21 @@ async function closeLastEnrollment(user) {
   return enrollment;
 }
 
+async function closeEnrollment(enrollment) {
+  enrollment.endTime = Date.now();
+  await enrollment.save();
+  return enrollment;
+}
+
 module.exports = {
   createEnrollment,
+  findOpenedEnrollmentsByUser,
   findLastEnrollmentByUser,
   findLastEnrollmentByUserAndBrand,
   findLastEnrollmentByUserAndRestaurant,
   findEnrolledUsersByBrand,
   findEnrolledUsersByRestaurant,
   updateLastEnrollment,
-  closeLastEnrollment
+  closeLastEnrollment,
+  closeEnrollment
 };

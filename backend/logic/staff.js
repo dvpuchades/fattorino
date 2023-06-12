@@ -2,14 +2,16 @@ const { findBrandById } = require('../database/brand');
 const { findTodaysDeliveriesForCourier, findDeliveryById } = require('../database/delivery');
 const { 
   createEnrollment,
-  findEnrolledUsersByBrand,
-  findLastEnrollmentByUserAndRestaurant,
   findLastEnrollmentByUser,
+  findEnrolledUsersByBrand,
+  findOpenedEnrollmentsByUser,
   closeLastEnrollment,
-  findLastEnrollmentByUserAndBrand
+  findLastEnrollmentByUserAndBrand,
+  findLastEnrollmentByUserAndRestaurant
 } = require('../database/enrollment.js');
 const { findRestaurantById } = require('../database/restaurant');
 const { findUserById } = require('../database/user');
+const { InvalidArgumentError } = require('../errors');
 
 // "staff" : {
 //   "_id": "id",
@@ -64,47 +66,63 @@ class Staff {
   }
 
   static async post({ user, restaurant, brand }) {
-    const userObject = await findUserById(user);
-    let enrollment;
-    if (restaurant) {
-      enrollment = await findLastEnrollmentByUserAndRestaurant(user, restaurant);
+    if (!brand) {
+      const restaurantObject = await findRestaurantById(restaurant);
+      brand = restaurantObject.brand;
     }
-    if (enrollment) {
-       restaurant = restaurant || enrollment.restaurant;
-      if (enrollment.endTime) {
-        const newEnrollment = await createEnrollment({
-          user,
-          restaurant,
-          position: enrollment.position,
-          brand: enrollment.brand
-        });
-        return await composeUser(userObject, enrollment);
+    const openedEnrollments = await findOpenedEnrollmentsByUser(user);
+    let existingEnrollment;
+    for (const enrollment of openedEnrollments) {
+      if (!existingEnrollment && enrollment.brand.equals(brand)) {
+        existingEnrollment = enrollment;
       }
       else {
-        return await composeUser(userObject, enrollment);
+        await closeEnrollment(enrollment._id);
       }
     }
-    else {
-      if (!brand) {
-        const restaurantObject = await findRestaurantById(restaurant);
-        brand = restaurantObject.brand;
-      }
-      const { creator } = await findBrandById(brand);
-      const isManager = creator.equals(user);
-      const enrollment = await createEnrollment({
-        user: user,
-        position: isManager ? 'manager' : 'staff',
+
+    if (existingEnrollment) throw new InvalidArgumentError('User already enrolled.');
+    
+    const previousEnrollment = await findLastEnrollmentByUserAndBrand(user, brand);
+    if (previousEnrollment) {
+      const newEnrollment = await createEnrollment({
+        user,
         brand,
-        restaurant: restaurant || null
+        position: previousEnrollment.position,
+        restaurant
       });
-      return await composeUser(userObject, enrollment);
+      return await composeUser(await findUserById(user), newEnrollment);
     }
+    const { creator } = await findBrandById(brand);
+    const isManager = creator.equals(user);
+    const enrollment = await createEnrollment({
+      user: user,
+      position: isManager ? 'manager' : 'staff',
+      brand,
+      restaurant
+    });
+    return await composeUser(await findUserById(user), enrollment);
   }
 
-  static async get({ courierForDelivery }) {
-    const { courier, brand } = await findDeliveryById(courierForDelivery);
-    const user = await findUserById(courier);
-    const enrollment = await findLastEnrollmentByUserAndBrand(courier, brand);
+  static async get({ _id, restaurant, brand, courierForDelivery }) {
+    let user, enrollment;
+    if (_id) {
+      user = await findUserById(_id);
+      if (restaurant) {
+        	enrollment = await findLastEnrollmentByUserAndRestaurant(_id, restaurant);
+      }
+      else if (brand) {
+        enrollment = await findLastEnrollmentByUserAndBrand(_id, brand);
+      }
+      else throw new InvalidArgumentError('No brand or restaurant id provided.');
+    }
+    else if (courierForDelivery) {
+      const { courier, brand } = await findDeliveryById(courierForDelivery);
+      user = await findUserById(courier);
+      enrollment = await findLastEnrollmentByUserAndBrand(courier, brand);
+    }
+    else throw new InvalidArgumentError('No staff id provided.');
+
     return await composeUser(user, enrollment);
   }
 

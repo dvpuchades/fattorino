@@ -2,7 +2,10 @@ const { findUserById } = require('../../database/user.js');
 const { findRestaurantById } = require('../../database/restaurant.js');
 const {
   createEnrollment,
-  findLastEnrollmentByUserAndRestaurant
+  findLastEnrollmentByUserAndRestaurant,
+  findLastEnrollmentByUserAndBrand,
+  findOpenedEnrollmentsByUser,
+  closeEnrollment
 } = require('../../database/enrollment.js');
 const { findTodaysDeliveriesForCourier } = require('../../database/delivery.js');
 const { findBrandById } = require('../../database/brand.js');
@@ -15,6 +18,7 @@ jest.mock('../../database/brand.js');
 
 const mongoose = require('mongoose');
 const Staff = require('../staff.js');
+const { InvalidArgumentError } = require('../../errors.js');
 
 const restaurantId = new mongoose.Types.ObjectId();
 const brandId = new mongoose.Types.ObjectId();
@@ -52,6 +56,7 @@ describe('testing post:staff logic', () => {
       enrollment._id = enrollmentId;
       return enrollment;
     });
+    closeEnrollment.mockResolvedValue(null);
   });
 
   it('should enroll a user providing brand without a previous enrollment (new brand scenario)', async () => {
@@ -65,6 +70,8 @@ describe('testing post:staff logic', () => {
     };
     findUserById.mockResolvedValue(user);
     findLastEnrollmentByUserAndRestaurant.mockResolvedValue(null);
+    findLastEnrollmentByUserAndBrand.mockResolvedValue(null);
+    findOpenedEnrollmentsByUser.mockResolvedValue([]);
 
     // Call the function to test
     const input = {
@@ -95,6 +102,8 @@ describe('testing post:staff logic', () => {
   it('should enroll a user given a restaurant without a previous enrollment (log in first time)', async () => {
     // Mock specific functions to this test
     findLastEnrollmentByUserAndRestaurant.mockResolvedValue(null);
+    findLastEnrollmentByUserAndBrand.mockResolvedValue(null);
+    findOpenedEnrollmentsByUser.mockResolvedValue([]);
 
     // Call the function to test
     const input = {
@@ -143,6 +152,8 @@ describe('testing post:staff logic', () => {
 
     createEnrollment.mockResolvedValue(createdEnrollment);
     findLastEnrollmentByUserAndRestaurant.mockResolvedValue(enrollment);
+    findLastEnrollmentByUserAndBrand.mockResolvedValue(null);
+    findOpenedEnrollmentsByUser.mockResolvedValue([enrollment]);
 
     // get current number of calls to createEnrollment
     const createEnrollmentNumberOfCalls = createEnrollment.mock.calls.length;
@@ -152,25 +163,12 @@ describe('testing post:staff logic', () => {
       user: userId.toString(),
       restaurant: restaurantId.toString()
     };
-    const result = await Staff.post(input);
-
-    // Check the result
-    const returnedUser = {
-      _id: userId,
-      email: 'user@test.com',
-      name: 'user',
-      phone: '123456789',
-      status: 'idle',
-      position: 'staff',
-      restaurant: 'restaurant'
-    };
-    expect(result._id).toBe(returnedUser._id);
-    expect(result.email).toBe(returnedUser.email);
-    expect(result.name).toBe(returnedUser.name);
-    expect(result.phone).toBe(returnedUser.phone);
-    expect(result.status).toBe(returnedUser.status);
-    expect(result.position).toBe(returnedUser.position);
-    expect(result.restaurant).toBe(returnedUser.restaurant);
+    try {
+      await Staff.post(input);
+    }	
+    catch (error) {
+      expect(error).toBeInstanceOf(InvalidArgumentError);
+    }
 
     // as an opened enrollment was found, the createEnrollment function should not be called
     expect(createEnrollment.mock.calls).toHaveLength(createEnrollmentNumberOfCalls);
@@ -198,6 +196,8 @@ describe('testing post:staff logic', () => {
 
     createEnrollment.mockResolvedValue(createdEnrollment);
     findLastEnrollmentByUserAndRestaurant.mockResolvedValue(enrollment);
+    findLastEnrollmentByUserAndBrand.mockResolvedValue(enrollment);
+    findOpenedEnrollmentsByUser.mockResolvedValue([]);
 
     // Call the function to test
     const input = {

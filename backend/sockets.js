@@ -6,6 +6,7 @@ const Restaurant = require('./logic/restaurant.js');
 const Staff = require('./logic/staff.js');
 const Brand = require('./logic/brand.js');
 const { connectToDatabase } = require('./database/connection.js');
+const { InvalidArgumentError } = require('./errors.js');
 
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
@@ -189,14 +190,33 @@ io.on('connection', (socket) => {
   });
 
   socket.on('post:staff', (staff) => {
+    const joinRoomAndEmitData = (staff, emitInRoom) => {
+      socket.brand = staff.brand.toString();
+      socket.join(staff.brand.toString());
+      if (emitInRoom) {
+        emitInRoom('post:staff', staff);
+      }
+      else {
+        socket.emit('post:staff', staff);
+      }
+      initialize();
+    };
     Staff.post(staff)
-      .then((newStaff) => {
-        socket.brand = newStaff.brand.toString();
-        socket.join(newStaff.brand.toString());
-        emitInRoom('post:staff', newStaff);
-        initialize();
-      })
+      .then((newStaff) => joinRoomAndEmitData(newStaff, true))
       .catch((error) => {
+        if (error instanceof InvalidArgumentError) {
+          // user was already registered
+          Staff.get({
+            _id: staff.user,
+            restaurant: staff.restaurant,
+            brand: staff.brand
+          })
+            .then((fetchedStaff) => joinRoomAndEmitData(fetchedStaff, false))
+            .catch((error) => {
+              console.log(error);
+              socket.emit('post:staff', { error });
+            });
+        }
         console.log(error);
         socket.emit('post:staff', { error });
       }
