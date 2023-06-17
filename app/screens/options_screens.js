@@ -1,5 +1,5 @@
 // Dashboard
-import { useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { ScrollView } from "react-native";
 import {
   Text,
@@ -128,7 +128,20 @@ const RestaurantListItem = (props) => {
 };
 
 const RestaurantProfile = ({ route }) => {
-  const restaurant = route.params.restaurant;
+  const restaurantToShow = route.params.restaurant;
+  const [restaurant, setRestaurant] = useState(restaurantToShow);
+
+  // subscribe to changes in the data
+  const { restaurants } = useContext(DataContext);
+  useEffect(() => {
+    for (const r of restaurants) {
+      if (r._id === restaurantToShow._id) {
+        setRestaurant(r);
+        break;
+      }
+    }
+  }, [restaurants]);
+
   const formatDate = (date) => {
     // assumes date is a string
     date = new Date(date);
