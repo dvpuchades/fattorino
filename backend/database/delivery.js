@@ -35,13 +35,12 @@ async function findRecentOrActiveDeliveries(brand) {
 // Find deliveries that are shipped for a restaurant
 async function findShippedTodayDeliveriesForRestaurant(restaurant) {
   const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+  const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
 
   const deliveries = await Delivery.find({
     restaurant,
     status: 'shipped',
-    endTime: { $gte: today, $lt: tomorrow }
+    endTime: { $gte: yesterday }
   }).lean();
 
   return deliveries;
@@ -55,7 +54,7 @@ async function findTodaysDeliveriesForCourier(courier) {
 
   const deliveries = await Delivery.find({
     courier,
-    initTime: { $gte: today, $lt: tomorrow }
+    initTime: { $gte: today }
   }).lean();
 
   return deliveries;

@@ -7,7 +7,8 @@ const {
   findOpenedEnrollmentsByUser,
   closeLastEnrollment,
   findLastEnrollmentByUserAndBrand,
-  findLastEnrollmentByUserAndRestaurant
+  findLastEnrollmentByUserAndRestaurant,
+  closeEnrollment
 } = require('../database/enrollment.js');
 const { findRestaurantById } = require('../database/restaurant');
 const { findUserById } = require('../database/user');

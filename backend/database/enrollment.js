@@ -88,10 +88,8 @@ async function closeLastEnrollment(user) {
   return enrollment;
 }
 
-async function closeEnrollment(enrollment) {
-  enrollment.endTime = Date.now();
-  await enrollment.save();
-  return enrollment;
+async function closeEnrollment({_id}) {
+  return await Enrollment.findOneAndUpdate({_id}, {endTime: Date.now()}, {new: true});
 }
 
 module.exports = {

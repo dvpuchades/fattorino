@@ -7,7 +7,7 @@ async function createRestaurant({brand, name, address, city, postcode, creatorId
 }
 
 async function findRestaurantById(id) {
-  const restaurant = await Restaurant.findById(id);
+  const restaurant = await Restaurant.findById(id).lean();
   return restaurant;
 }
 

@@ -1,9 +1,13 @@
 const { 
   findRestaurantsByBrandId,
-  createRestaurant
+  createRestaurant,
+  findRestaurantById
 } = require('../database/restaurant.js');
 const { findUserById } = require('../database/user.js');
-const { findShippedTodayDeliveriesForRestaurant } = require('../database/delivery.js');
+const { 
+  findShippedTodayDeliveriesForRestaurant,
+  findDeliveryById
+ } = require('../database/delivery.js');
 const { findEnrolledUsersByRestaurant } = require('../database/enrollment.js');
 
 // "restaurant" : {
@@ -18,11 +22,13 @@ const { findEnrolledUsersByRestaurant } = require('../database/enrollment.js');
 // }
 
 const composeRestaurant = async (restaurant /*restaurant as given by database*/) => {
-  restaurant.numberOfDeliveries = await findShippedTodayDeliveriesForRestaurant(restaurant._id).length;
+  const deliveries = await findShippedTodayDeliveriesForRestaurant(restaurant._id);
+  restaurant.numberOfDeliveries = deliveries.length;
   if (typeof restaurant.numberOfDeliveries === 'undefined') {
     restaurant.numberOfDeliveries = 0;
   }
-  restaurant.activeUsers = await findEnrolledUsersByRestaurant(restaurant._id).length;
+  const users = await findEnrolledUsersByRestaurant(restaurant._id);
+  restaurant.activeUsers = users.length;
   if (typeof restaurant.activeUsers === 'undefined') {
     restaurant.activeUsers = 0;
   }
@@ -45,6 +51,18 @@ class Restaurant {
   static async isFirstRestaurant(brand) {
     const restaurants = await findRestaurantsByBrandId(brand);
     return restaurants.length === 1;
+  }
+
+  static async get({ _id, deliveryId }) {
+    let restaurant;
+    if (_id) {
+      restaurant = await findRestaurantById(_id);
+    }
+    if (deliveryId) {
+      const delivery = await findDeliveryById(deliveryId);
+      restaurant = await findRestaurantById(delivery.restaurant);
+    }
+    return await composeRestaurant(restaurant);
   }
 
 }
