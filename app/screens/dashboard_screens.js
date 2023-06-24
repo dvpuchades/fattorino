@@ -91,11 +91,6 @@ const DashboardScreen = ({navigation}) => {
         <MaterialCommunityIcons name="noodles" color={color} size={size}/>
       )}}
       />
-      <Tab.Screen name="Trips" component={TripScreen}
-      options={{tabBarIcon: ({color, size}) => (
-        <MaterialCommunityIcons name="map-marker-path" color={color} size={size}/>
-      )}}
-      />
       <Tab.Screen name="Options" component={OptionsScreen}
       options={{tabBarIcon: ({color, size}) => (
         <MaterialCommunityIcons name="menu" color={color} size={size}/>
@@ -140,7 +135,6 @@ const OptionsScreen = () => {
   return (
     <OptionStack.Navigator screenOptions={{ headerShown: false }}>
       <OptionStack.Screen name="OptionList" component={OptionList}/>
-      <OptionStack.Screen name="TripList" component={TripList}/>
       <OptionStack.Screen name="RestaurantList" component={RestaurantList}/>
       <OptionStack.Screen name="RestaurantProfile" component={RestaurantProfile}/>
       <OptionStack.Screen name="CreateRestaurantScreen" component={CreateRestaurantScreen}/>
