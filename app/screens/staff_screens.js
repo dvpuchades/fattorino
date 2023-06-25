@@ -6,6 +6,7 @@ import {
   HStack,
   Box
 } from "native-base";
+import * as Linking from "expo-linking";
 import { colors } from '../constants.js';
 import { FilteredListLayout, ProfileLayout } from "../components/layouts.js";
 import { useDisclose } from "native-base";
@@ -121,7 +122,7 @@ const StaffProfile = ({route}) => {
         <Option text="log him out" icon="logout"/>
       </Box>
       <Button mx="4" colorScheme="primary"
-      onPress={() => { }}
+      onPress={() => Linking.openURL(`tel:${staff.phone}`)}
       >Call now</Button>
     </ProfileLayout>
   );
