@@ -1,5 +1,5 @@
 // Dashboard
-import { useState, useEffect, useContext } from "react";
+import { useRef, useState, useEffect, useContext } from "react";
 import { ScrollView } from "react-native";
 import {
   Text,
@@ -25,6 +25,16 @@ const OptionList = ({navigation}) => {
     restaurants
   } = useContext(DataContext);
 
+  const userRestaurant = useRef();
+
+  useEffect(() => {
+    if (user.restaurant) {
+      userRestaurant.current = restaurants.find(
+        (item) => item.name === user.restaurant
+      );
+    }
+  }, [user, restaurants]);
+
   return (
     <Box width="100%" flex="1">
     <Center>
@@ -34,16 +44,10 @@ const OptionList = ({navigation}) => {
     <Option icon="home-group" text="restaurants"
     onPress={() => navigation.navigate("RestaurantList")}/>
     { user.restaurant ?
-        <Option icon="qrcode" text="show your restaurant"
+        <Option icon="qrcode" text="my restaurant"
         onPress={() => 
           navigation.navigate("RestaurantProfile", {
-            restaurant: () => {
-              for (const restaurant of restaurants) {
-                if (restaurant._id === user.restaurant) {
-                  return restaurant;
-                }
-              }
-            }
+            restaurant: userRestaurant.current
           })
         }/> : null
     }
