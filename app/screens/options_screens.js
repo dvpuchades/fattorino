@@ -163,14 +163,14 @@ const RestaurantProfile = ({ route }) => {
           <QRCode value={restaurant._id}/>
         </Center>
         <Box mx="4">
-          <Option text="connect to restaurant" icon="home-import-outline"/>
+          {/* <Option text="connect to restaurant" icon="home-import-outline"/> */}
           <Tag icon="noodles" text={restaurant.numberOfDeliveries + " deliveries shipped today"}/>
           <Tag icon="account-group" text={restaurant.activeUsers + " active members"}/>
           <Tag icon="calendar-plus" text={"posted on " + formatDate(restaurant.creationDate)}/>
           <Tag icon="home-plus" text={ "posted by " + restaurant.creatorName}/>
           <Tag icon="map-marker" text={restaurant.address}/>
           <Tag icon="city-variant" text={restaurant.city + ", " + restaurant.postcode}/>
-          <Option text="remove restaurant" icon="home-minus"/>
+          {/* <Option text="remove restaurant" icon="home-minus"/> */}
         </Box>
     </ProfileLayout>
   );
