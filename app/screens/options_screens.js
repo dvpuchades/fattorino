@@ -9,6 +9,7 @@ import {
   Box
 } from "native-base";
 import QRCode from "react-native-qrcode-svg";
+import * as Linking from "expo-linking";
 import { FormLayout, ProfileLayout, CreateRestaurantForm } from "../components/layouts.js";
 import { Tag, Option } from "../components/widgets.js";
 import { ListItem } from "../components/widgets.js";
@@ -68,7 +69,7 @@ const OptionList = ({navigation}) => {
       }}/> : null
     }
     <Option icon="bug" text="report a problem"
-    onPress={() => navigation.navigate("ReportScreen")}/>
+    onPress={() => Linking.openURL('mailto:dvpuchades@gmail.com?subject=Fattorino Bug')}/>
     <Option icon="pound" text="version info"
     onPress={() => navigation.navigate("VersionScreen")}/>
     <Option icon="logout" text="log out"
