@@ -254,7 +254,7 @@ const PostDeliveryScreen = ({navigation}) => {
       <FormControl isRequired>
         <Input my="3" placeholder="customer phone" value={customerPhone} onChangeText={setCustomerPhone}/>
       </FormControl>
-      <Select width="100%" placeholder="Select restaurant"
+      <Select my="1.5" width="100%" placeholder="Select restaurant"
         selectedValue={restaurant}
         onValueChange={(id) => setRestaurant(id)}
       >
