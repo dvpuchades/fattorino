@@ -141,8 +141,11 @@ class Staff {
 
 
   static async delete({_id}) {
-    await closeLastEnrollment(_id);
-    return _id;
+    const {restaurant} = await closeLastEnrollment(_id);
+    return {
+      _id,
+      restaurant
+    };
   }
 }
 

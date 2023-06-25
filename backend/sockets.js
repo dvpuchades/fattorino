@@ -13,9 +13,27 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
-    if (socket.brand) {
-      socket.leave(socket.brand);
+    if (socket.user && socket.brand) {
+      Staff.delete({_id: socket.user})
+        .then((deletedStaff) => {
+          emitInRoom('delete:staff', deletedStaff._id);
+          if (deletedStaff.restaurant) {
+            Restaurant.get({ _id: deletedStaff.restaurant })
+              .then((restaurant) => {
+                emitInRoom('update:restaurant', restaurant);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }
+          socket.leave(socket.brand);
+        })
+        .catch((error) => {
+          console.log(error);
+          socket.emit('delete:staff', { error });
+        });
     }
+
   });
 
   const initialize = () => {
@@ -46,12 +64,14 @@ io.on('connection', (socket) => {
   };
 
   // socket contains brand info as below:
+  // socket.user = user._id
   // socket.brand = brand
 
   socket.on('register', (user) => {
     Auth.register(user)
       .then((user) => {
         socket.emit('auth', { user: user._id });
+        socket.user = user._id;
       })
       .catch((error) => {
         console.log(error);
@@ -63,6 +83,7 @@ io.on('connection', (socket) => {
     Auth.auth(email, password)
       .then((user) => {
         socket.emit('auth', { user: user._id });
+        socket.user = user._id;
       })
       .catch((error) => {
         console.log(error);
@@ -199,11 +220,12 @@ io.on('connection', (socket) => {
   });
 
   socket.on('post:staff', (staff) => {
-    const joinRoomAndEmitData = (staff, broadcast) => {
-      socket.brand = staff.brand.toString();
-      socket.join(staff.brand.toString());
+    const joinRoomAndEmitData = (composedStaff, broadcast) => {
+      socket.user = composedStaff._id.toString();
+      socket.brand = composedStaff.brand.toString();
+      socket.join(composedStaff.brand.toString());
       if (broadcast) {
-        emitInRoom('post:staff', staff);
+        emitInRoom('post:staff', composedStaff);
         if (staff.restaurant) {
           Restaurant.get({ _id: staff.restaurant })
             .then((restaurant) => {
@@ -216,7 +238,7 @@ io.on('connection', (socket) => {
         }
       }
       else {
-        socket.emit('post:staff', staff);
+        socket.emit('post:staff', composedStaff);
       }
       initialize();
     };
@@ -256,7 +278,16 @@ io.on('connection', (socket) => {
   socket.on('delete:staff', (staff) => {
     Staff.delete(staff)
       .then((deletedStaff) => {
-        emitInRoom('delete:staff', deletedStaff);
+        emitInRoom('delete:staff', deletedStaff._id);
+        if (staff.restaurant) {
+          Restaurant.get({ _id: deletedStaff.restaurant })
+            .then((restaurant) => {
+              emitInRoom('update:restaurant', restaurant);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
       })
       .catch((error) => {
         console.log(error);
