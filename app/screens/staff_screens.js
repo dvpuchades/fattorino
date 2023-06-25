@@ -12,7 +12,6 @@ import { useDisclose } from "native-base";
 import { ListItem, Tag, TripCard, Option } from "../components/widgets.js";
 import { useContext, useState } from "react";
 import { hasFilter, StaffRestaurantFilter } from "../components/filters.js";
-import { StaffFilterContext } from "../components/filter_providers.js";
 import { DataContext } from "../components/data_provider.js";
 import { formatDate } from "../utils/date.js";
 

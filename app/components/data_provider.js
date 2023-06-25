@@ -212,7 +212,9 @@ const DataProvider = ({children}) => {
     if (checkFilters(deliveryFilters, delivery) && !includes(delivery, filteredDeliveries)) {
       setFilteredDeliveries([...filteredDeliveries, delivery]);
     }
-    setDeliveries([...deliveries, delivery]);
+    if (!includes(delivery, deliveries)) {
+      setDeliveries([...deliveries, delivery]);
+    }
   };
 
   const updateDelivery = (delivery) => {
