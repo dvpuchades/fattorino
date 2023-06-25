@@ -1,12 +1,11 @@
 import React, {useState, createContext, useEffect, useRef} from "react";
-import io from 'socket.io-client';
-import { server } from "../environment.js";
+import { uniqueSocket } from "../services/socket.js";
 import { storeData, getData } from "../utils/storage.js";
 
 const DataContext = createContext();
 
 const DataProvider = ({children}) => {
-  const [socket, setSocket] = useState(io(server.uri));
+  const [socket, setSocket] = useState(uniqueSocket);
   const [user, setUser] = useState(null);
   const [deliveries, setDeliveries] = useState([]);
   const [staff, setStaff] = useState([]);
@@ -165,6 +164,7 @@ const DataProvider = ({children}) => {
 
     return () => {
       socket.off('connect');
+      socket.off('auth');
       socket.off('init:delivery');
       socket.off('post:delivery');
       socket.off('update:delivery');
