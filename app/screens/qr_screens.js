@@ -44,7 +44,7 @@ const ScanQRCodeScreen = ({navigation}) => {
     <Center px="4">
       <VStack px="4" width="100%" height="100%">
       <Spacer flex="1"/>
-      <Text flex="1" fontSize="6xl" textAlign="center">
+      <Text flex="1" fontSize="4xl" textAlign="center">
         Scan QR
       </Text>
       <Button flex="1" variant="link" my="5"

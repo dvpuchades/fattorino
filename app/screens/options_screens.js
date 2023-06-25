@@ -28,7 +28,7 @@ const OptionList = ({navigation}) => {
   return (
     <Box width="100%" flex="1">
     <Center>
-      <Text fontSize="6xl">Options</Text>
+      <Text fontSize="5xl">Options</Text>
     </Center>
     <Box flex="5" margin="4" justifyContent="space-around">
     <Option icon="home-group" text="restaurants"
@@ -99,7 +99,7 @@ const RestaurantList = ({navigation}) => {
   return (
     <Box width="100%" flex="1">
     <Center>
-      <Text fontSize="6xl">Restaurants</Text>
+      <Text fontSize="5xl">Restaurants</Text>
     </Center>
     <Box flex="5">
     <ScrollView>

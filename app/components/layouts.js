@@ -18,7 +18,7 @@ const FormLayout = (props) => {
   return (
       <ScrollView px="4" width="100%" height="100%">
           <Center flex="1">
-            <Text fontSize="6xl" textAlign="center" style={styles.logo}>
+            <Text fontSize="5xl" textAlign="center" style={styles.logo}>
                 fattorino
             </Text>
           <Text style={styles.text} mb="3">{ props.description }</Text>
@@ -39,7 +39,7 @@ const FilteredListLayout = (props) => {
   return (
     <Box width="100%" flex="1">
     <Center>
-      <Text fontSize="6xl">{ props.title }</Text>
+      <Text fontSize="5xl">{ props.title }</Text>
       <ScrollView width="100%" horizontal
       showsHorizontalScrollIndicator={false}>
         { props.children }
@@ -61,7 +61,7 @@ const ProfileLayout = (props) => {
   return (
     <ScrollView width="100%" flex="1">
       <Center mb="4">
-        <Heading fontSize="4xl">{ props.title }</Heading>
+        <Heading fontSize="5xl">{ props.title }</Heading>
         <Text fontSize="xl">
           { props.subtitle }
         </Text>
