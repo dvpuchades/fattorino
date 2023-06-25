@@ -187,8 +187,9 @@ const VersionScreen = () => {
   return (
     <FormLayout description="Some information about your current version">
       <Box width="100%">
-      <Tag icon="pound" text="version 0.0.1"/>
-      <Tag icon="server" text="standalone build"/>
+      <Tag icon="pound" text="mvp"/>
+      <Tag icon="server" text="23.0.0 server"/>
+      <Tag icon="database" text="development database"/>
       <Tag icon="heart" text="made by dvpuchades" color={colors.primaryColor}/>
       </Box>
     </FormLayout>
