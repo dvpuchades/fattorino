@@ -199,10 +199,10 @@ io.on('connection', (socket) => {
   });
 
   socket.on('post:staff', (staff) => {
-    const joinRoomAndEmitData = (staff, emitInRoom) => {
+    const joinRoomAndEmitData = (staff, broadcast) => {
       socket.brand = staff.brand.toString();
       socket.join(staff.brand.toString());
-      if (emitInRoom) {
+      if (broadcast) {
         emitInRoom('post:staff', staff);
         if (staff.restaurant) {
           Restaurant.get({ _id: staff.restaurant })
