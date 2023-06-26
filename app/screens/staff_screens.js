@@ -119,7 +119,6 @@ const StaffProfile = ({route}) => {
         text={staff.numberOfDeliveries + " deliveries delivered today"}/>
         <Tag icon="cash" text={staff.balance + " € in balance"}/>
         <Tag icon="phone" text={staff.phone}/>
-        <Option text="log him out" icon="logout"/>
       </Box>
       <Button mx="4" colorScheme="primary"
       onPress={() => Linking.openURL(`tel:${staff.phone}`)}
