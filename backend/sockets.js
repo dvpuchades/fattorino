@@ -14,23 +14,30 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
     if (socket.user && socket.brand) {
-      Staff.delete({_id: socket.user})
-        .then((deletedStaff) => {
-          emitInRoom('delete:staff', deletedStaff._id);
-          if (deletedStaff.restaurant) {
-            Restaurant.get({ _id: deletedStaff.restaurant })
-              .then((restaurant) => {
-                emitInRoom('update:restaurant', restaurant);
+      Staff.get({ _id: socket.user, brand: socket.brand })
+        .then((staff) => {
+          if (staff.status !== 'delivering') {
+            Staff.delete({_id: socket.user})
+              .then((deletedStaff) => {
+                emitInRoom('delete:staff', deletedStaff._id);
+                if (deletedStaff.restaurant) {
+                  Restaurant.get({ _id: deletedStaff.restaurant })
+                    .then((restaurant) => {
+                      emitInRoom('update:restaurant', restaurant);
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                    });
+                }
+                socket.leave(socket.brand);
               })
               .catch((error) => {
                 console.log(error);
               });
           }
-          socket.leave(socket.brand);
         })
         .catch((error) => {
           console.log(error);
-          socket.emit('delete:staff', { error });
         });
     }
 
