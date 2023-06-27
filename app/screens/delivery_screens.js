@@ -246,13 +246,13 @@ const PostDeliveryScreen = ({navigation}) => {
         <Input my="3" placeholder="postcode" value={postcode} onChangeText={setPostcode}/>
       </FormControl>
       <FormControl isRequired>
-        <Input my="3" placeholder="amount" value={amount} onChangeText={setAmount}/>
+        <Input my="3" placeholder="amount" keyboardType="numeric" value={amount} onChangeText={setAmount}/>
       </FormControl>
       <FormControl isRequired>
         <Input my="3" placeholder="customer name" value={customerName} onChangeText={setCustomerName}/>
       </FormControl>
       <FormControl isRequired>
-        <Input my="3" placeholder="customer phone" value={customerPhone} onChangeText={setCustomerPhone}/>
+        <Input my="3" placeholder="customer phone" keyboardType="numeric" value={customerPhone} onChangeText={setCustomerPhone}/>
       </FormControl>
       <Select my="1.5" width="100%" placeholder="Select restaurant"
         selectedValue={restaurant}

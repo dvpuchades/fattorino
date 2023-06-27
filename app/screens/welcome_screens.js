@@ -20,6 +20,7 @@ const SignUpScreen = ({navigation}) => {
         value={email}/>
       <Input my="5" variant="filled" placeholder="phone number"
         onChangeText={(value) => setPhone(value)}
+        keyboardType="numeric"
         value={phone}/>
       <Input my="5" variant="filled" placeholder="name"
         onChangeText={(value) => setName(value)}
