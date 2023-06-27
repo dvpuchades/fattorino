@@ -3,11 +3,13 @@ import {
   VStack,
   HStack,
   Box,
-  Center
+  Center,
+  Alert
 } from "native-base";
 import { Pressable } from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { formatDate } from '../utils/date.js';
+import { useEffect, useState } from "react";
 
 const ListItem = (props) => {
   return (
@@ -124,4 +126,32 @@ const IconByStatus = (props) => {
   }
 };
 
-export { ListItem, Tag, TripCard, Option };
+const ErrorAlert = ({error}) => {
+
+  if (!error) return null;
+
+  return (
+    <Alert w="100%" status="error">
+      <VStack space={1} flexShrink={1} w="100%" alignItems="center">
+        <Alert.Icon size="md" />
+        <Text fontSize="md" fontWeight="medium" _dark={{
+        color: "coolGray.800"
+      }}>
+          {error.name}
+        </Text>
+
+        <Box _text={{
+        textAlign: "center"
+      }} _dark={{
+        _text: {
+          color: "coolGray.600"
+        }
+      }}>
+          {error.message}
+        </Box>
+      </VStack>
+    </Alert>
+  );
+};
+
+export { ListItem, Tag, TripCard, Option, ErrorAlert };

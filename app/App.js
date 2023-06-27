@@ -20,6 +20,7 @@ import { ScanQRCodeScreen } from "./screens/qr_screens.js";
 import { CreateBrandScreen, CreateFirstRestaurantScreen } from "./screens/creation_screens.js";
 import DashboardScreen from "./screens/dashboard_screens.js";
 import { DataContext, DataProvider } from "./components/data_provider.js";
+import { ErrorAlert } from "./components/widgets.js";
 
 // Define the config
 const config = {
@@ -57,10 +58,11 @@ export default function App() {
 }
 
 const RootNavigator = () => {
-  const { user } = useContext(DataContext);
+  const { user, error } = useContext(DataContext);
 
   return (
     <NavigationContainer>
+      <ErrorAlert error={error}/>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         { user ?
         <>

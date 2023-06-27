@@ -11,6 +11,7 @@ const DataProvider = ({children}) => {
   const [staff, setStaff] = useState([]);
   const [trips, setTrips] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
+  const [error, setError] = useState(null);
 
   // staff filters
   const [staffFilters, setStaffFilters] = useState(new Map());
@@ -162,6 +163,13 @@ const DataProvider = ({children}) => {
       postBrand(brand);
     });
 
+    socket.on('error', ({error}) => {
+      setError(error);
+      setTimeout(() => {
+        setError(null);
+      }, 7000);
+    });
+
     return () => {
       socket.off('connect');
       socket.off('auth');
@@ -179,6 +187,7 @@ const DataProvider = ({children}) => {
       socket.off('post:restaurant');
       socket.off('update:restaurant');
       socket.off('post:brand');
+      socket.off('error');
     };
   }, [
     socket,
@@ -188,7 +197,8 @@ const DataProvider = ({children}) => {
     trips,
     restaurants,
     filteredDeliveries,
-    filteredStaff
+    filteredStaff,
+    error
   ]);
 
   // try to get user from storage
@@ -196,12 +206,10 @@ const DataProvider = ({children}) => {
     const userPromise = getData('user');
     const restaurantPromise = getData('restaurant');
     const brandPromise = getData('brand');
-    console.log('getting user from storage');
     Promise.all([userPromise, restaurantPromise, brandPromise])
       .then(([user, restaurant, brand]) => {
         setUser(user)
         if (user && (restaurant || brand)) {
-          console.log('getting user from storage', {user, restaurant, brand});
           socket.emit('post:staff', {user, restaurant, brand});
         }
       }
@@ -336,7 +344,8 @@ const DataProvider = ({children}) => {
       filteredDeliveries,
       deliveryFilters,
       addDeliveryFilter,
-      removeDeliveryFilter
+      removeDeliveryFilter,
+      error
     }}>
       {children}
     </DataContext.Provider>
