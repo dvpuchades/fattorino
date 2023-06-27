@@ -17,6 +17,7 @@ const {
 io.on('connection', (socket) => {
 
   const handleError = (error) => {
+    let isParsed = true;
     if (error instanceof CastError || error instanceof ValidationError) {
       socket.emit('error', { error: new UserFriendlyError(
         'Please check your input and try again.',
@@ -39,9 +40,16 @@ io.on('connection', (socket) => {
       });
     }
     else {
+      isParsed = false;
       socket.emit('error', { error });
     }
-    console.log(error);
+    console.log(
+      Date.now().toString(),
+      'Error sent to user:',
+      '  user id: ' + socket.user,
+      '  brand id: ' + socket.brand,
+      '  parsed before sending: ' + isParsed,
+      '  error: ', error);
   };
 
   console.log('Client connected:', socket.id);
