@@ -19,7 +19,9 @@ import {
   FormControl,
   Actionsheet,
   useDisclose,
-  Select
+  Select,
+  Spinner,
+  Heading
 } from "native-base";
 import { colors } from '../constants.js';
 import { FormLayout, FilteredListLayout, ProfileLayout } from "../components/layouts.js";
@@ -148,9 +150,15 @@ const DeliveryProfile = ({route}) => {
 
 const ButtonByStatus = ({delivery}) => {
   const { socket, user } = useContext(DataContext);
+  const loading = useRef(false);
+
+  useEffect(() => {
+    loading.current = false;
+  }, [delivery]);
 
   const updateDelivery = (delivery) => {
     socket.emit('update:delivery', delivery);
+    loading.current = true;
   };
 
   const handleReady = () => {
@@ -178,6 +186,8 @@ const ButtonByStatus = ({delivery}) => {
       endTime: new Date()
     });
   };
+
+  if (loading.current) return (<Spinner/>) ;
 
   switch (delivery.status) {
     case "preparing":
