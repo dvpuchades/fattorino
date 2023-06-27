@@ -6,9 +6,44 @@ const Restaurant = require('./logic/restaurant.js');
 const Staff = require('./logic/staff.js');
 const Brand = require('./logic/brand.js');
 const { connectToDatabase } = require('./database/connection.js');
-const { InvalidArgumentError } = require('./errors.js');
+const { InvalidArgumentError, UserFriendlyError } = require('./errors.js');
+const { title } = require('process');
+const {
+  CastError,
+  ValidationError,
+  ValidatorError
+} = require('mongoose').Error;
 
 io.on('connection', (socket) => {
+
+  const handleError = (error) => {
+    if (error instanceof CastError || error instanceof ValidationError) {
+      socket.emit('error', { error: new UserFriendlyError(
+        'Please check your input and try again.',
+        'Invalid Input'
+        )
+      });
+    }
+    else if (error instanceof ValidatorError) {
+      socket.emit('error', { error: new UserFriendlyError(
+        'You might have missed a required field.',
+        'Incomplete Input'
+        )
+      });
+    }
+    else if (error instanceof DocumentNotFoundError){
+      socket.emit('error', { error: new UserFriendlyError(
+        'Please try again. If the problem persists, please contact us.',
+        'Something Went Wrong'
+        )
+      });
+    }
+    else {
+      socket.emit('error', { error });
+    }
+    console.log(error);
+  };
+
   console.log('Client connected:', socket.id);
 
   socket.on('disconnect', () => {
@@ -48,26 +83,17 @@ io.on('connection', (socket) => {
       .then((deliveries) => {
         socket.emit('init:delivery', deliveries);
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('init:delivery', { error });
-      });
+      .catch((error) => handleError(error));
     Restaurant.init(socket.brand)
       .then((restaurants) => {
         socket.emit('init:restaurant', restaurants);
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('init:restaurant', { error });
-      });
+      .catch((error) => handleError(error));
     Staff.init(socket.brand)
       .then((staff) => {
         socket.emit('init:staff', staff);
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('init:staff', { error });
-      });
+      .catch((error) => handleError(error));
   };
 
   // socket contains brand info as below:
@@ -80,10 +106,7 @@ io.on('connection', (socket) => {
         socket.emit('auth', { user: user._id });
         socket.user = user._id;
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('auth', { error });
-      });
+      .catch((error) => handleError(error));
   });
 
   socket.on('auth', ({email, password}) => {
@@ -92,11 +115,7 @@ io.on('connection', (socket) => {
         socket.emit('auth', { user: user._id });
         socket.user = user._id;
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('auth', { error });
-      }
-    );
+      .catch((error) => handleError(error));
   });
 
   const emitInRoom = (event, data) => {
@@ -109,11 +128,7 @@ io.on('connection', (socket) => {
       .then((deliveries) => {
         socket.emit('init:delivery', deliveries);
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('init:delivery', { error });
-      }
-    );
+      .catch((error) => handleError(error));
   });
 
   socket.on('post:delivery', (delivery) => {
@@ -121,11 +136,7 @@ io.on('connection', (socket) => {
       .then((newDelivery) => {
         emitInRoom('post:delivery', newDelivery);
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('post:delivery', { error });
-      }
-    );
+      .catch((error) => handleError(error));
   });
 
   socket.on('update:delivery', (delivery) => {
@@ -150,11 +161,7 @@ io.on('connection', (socket) => {
             });
         }
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('update:delivery', { error });
-      }
-    );
+      .catch((error) => handleError(error));
   });
 
   socket.on('delete:delivery', (delivery) => {
@@ -162,11 +169,7 @@ io.on('connection', (socket) => {
       .then((deletedDelivery) => {
         emitInRoom('delete:delivery', deletedDelivery);
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('delete:delivery', { error });
-      }
-    );
+      .catch((error) => handleError(error));
   });
 
   socket.on('init:restaurant', () => {
@@ -174,11 +177,7 @@ io.on('connection', (socket) => {
       .then((restaurants) => {
         socket.emit('init:restaurant', restaurants);
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('init:restaurant', { error });
-      }
-    );
+      .catch((error) => handleError(error));
   });
 
   socket.on('post:restaurant', (restaurant) => {
@@ -193,10 +192,7 @@ io.on('connection', (socket) => {
                   socket.emit('post:staff', newStaff);
                   initialize();
                 })
-                .catch((error) => {
-                  console.log(error);
-                  socket.emit('post:restaurant', { error });
-                });
+                .catch((error) => handleError(error));
             }
             else {
               // emit to all sockets in the room
@@ -207,11 +203,7 @@ io.on('connection', (socket) => {
             }
           })
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('post:restaurant', { error });
-      }
-    );
+      .catch((error) => handleError(error));
   });
 
   socket.on('init:staff', () => {
@@ -219,11 +211,7 @@ io.on('connection', (socket) => {
       .then((staff) => {
         socket.emit('init:staff', staff);
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('init:staff', { error });
-      }
-    );
+      .catch((error) => handleError(error));
   });
 
   socket.on('post:staff', (staff) => {
@@ -238,10 +226,7 @@ io.on('connection', (socket) => {
             .then((restaurant) => {
               emitInRoom('update:restaurant', restaurant);
             })
-            .catch((error) => {
-              console.log(error);
-              socket.emit('post:staff', { error });
-            });
+            .catch((error) => handleError(error));
         }
       }
       else {
@@ -260,13 +245,11 @@ io.on('connection', (socket) => {
             brand: staff.brand
           })
             .then((fetchedStaff) => joinRoomAndEmitData(fetchedStaff, false))
-            .catch((error) => {
-              console.log(error);
-              socket.emit('post:staff', { error });
-            });
+            .catch((error) => handleError(error));
         }
-        console.log(error);
-        socket.emit('post:staff', { error });
+        else {
+          handleError(error);
+        }
       }
     );
   });
@@ -276,10 +259,7 @@ io.on('connection', (socket) => {
       .then((updatedStaff) => {
         emitInRoom('update:staff', updatedStaff);
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('update:staff', { error });
-      });
+      .catch((error) => handleError(error));
   });
 
   socket.on('delete:staff', (staff) => {
@@ -296,10 +276,7 @@ io.on('connection', (socket) => {
             });
         }
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('delete:staff', { error });
-      });
+      .catch((error) => handleError(error));
   });
 
   socket.on('post:brand', (brand) => {
@@ -309,10 +286,7 @@ io.on('connection', (socket) => {
         socket.join(newBrand._id.toString());
         socket.emit('post:brand', newBrand);
       })
-      .catch((error) => {
-        console.log(error);
-        socket.emit('post:brand', { error });
-      });
+      .catch((error) => handleError(error));
   });
 
 });
