@@ -16,7 +16,7 @@ import {
   SignUpScreen
 } from './screens/welcome_screens.js';
 import { colors, styles } from './constants.js';
-import { ScanQRCodeScreen } from "./screens/qr_screens.js";
+import { ExplainQRCodeScreen, ScanQRCodeScreen } from "./screens/qr_screens.js";
 import { CreateBrandScreen, CreateFirstRestaurantScreen } from "./screens/creation_screens.js";
 import DashboardScreen from "./screens/dashboard_screens.js";
 import { DataContext, DataProvider } from "./components/data_provider.js";
@@ -69,6 +69,7 @@ const RootNavigator = () => {
         { (user.position !== "manager" && !user.restaurant) ?
           <>
           <Stack.Screen name="ScanQRCodeScreen" component={ScanQRCodeScreen}/>
+          <Stack.Screen name="ExplainQRCodeScreen" component={ExplainQRCodeScreen}/>
           <Stack.Screen name="CreateBrandScreen" component={CreateBrandScreen}/>
           <Stack.Screen name="CreateRestaurantScreen" component={CreateFirstRestaurantScreen}/>
           </> :

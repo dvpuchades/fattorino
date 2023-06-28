@@ -1,10 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
-import { View, Center, VStack, Button, Text, Spacer } from 'native-base';
+import { View, Center, VStack, Button, Text, Spacer, Input } from 'native-base';
 // https://docs.expo.io/versions/latest/sdk/bar-code-scanner/
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { DataContext } from '../components/data_provider.js';
 import { storeData } from '../utils/storage.js';
+import { FormLayout } from '../components/layouts.js';
 
 const ScanQRCodeScreen = ({navigation}) => {
   const [hasPermission, setHasPermission] = useState(null);
@@ -49,6 +50,7 @@ const ScanQRCodeScreen = ({navigation}) => {
       </Text>
       <Button flex="1" variant="link" my="5"
         width="100%"
+        onPress={() => navigation.navigate('ExplainQRCodeScreen')}
       >Don't you know where to find it? Tap here!</Button>
       <View flex="6">
       <BarCodeScanner
@@ -72,4 +74,42 @@ const ScanQRCodeScreen = ({navigation}) => {
   );
 }
 
-export { ScanQRCodeScreen };
+const ExplainQRCodeScreen = ({navigation}) => {
+  const [accessCode, setAccessCode] = useState('');
+  const { socket, user } = useContext(DataContext);
+
+  const handleAccess = () => {
+    socket.emit('post:staff', {
+      user,
+      restaurant: accessCode
+    });
+    storeData('restaurant', accessCode);
+  };
+
+  return (
+    <FormLayout description="A brief introduction to restaurant access.">
+      <Text my="4" textAlign="justify">
+        QR codes are used to access restaurants.
+        If you want to access a restaurant, you need to scan its QR code. 
+      </Text>
+      <Text my="4" textAlign="justify">
+        You will need to ask a mate for the QR code of your restaurant.
+        He can find it in the restaurant profile. 
+      </Text>
+      <Text my="4" textAlign="justify">
+        If you can't scan the QR code, you can also enter the restaurant
+        code access manually below. This code is also available in the
+        restaurant profile. 
+      </Text>
+      <Input my="5" placeholder="brand name"
+      onChangeText={(value) => setAccessCode(value)}
+      value={accessCode}/>
+      <Button my="5" colorScheme="primary"
+      width="100%"
+      onPress={() => handleAccess() }
+      >Register Brand</Button>
+    </FormLayout>
+  );
+};
+
+export { ScanQRCodeScreen, ExplainQRCodeScreen };

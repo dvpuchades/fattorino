@@ -1,6 +1,6 @@
 // Dashboard
 import { useRef, useState, useEffect, useContext } from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, Share } from "react-native";
 import {
   Text,
   Button,
@@ -171,7 +171,8 @@ const RestaurantProfile = ({ route }) => {
           <Tag icon="home-plus" text={ "posted by " + restaurant.creatorName}/>
           <Tag icon="map-marker" text={restaurant.address}/>
           <Tag icon="city-variant" text={restaurant.city + ", " + restaurant.postcode}/>
-          {/* <Option text="remove restaurant" icon="home-minus"/> */}
+          <Option icon="content-paste" text="share access code"
+            onPress={ () => Share.share({ message: restaurant._id }) }/>
         </Box>
     </ProfileLayout>
   );
